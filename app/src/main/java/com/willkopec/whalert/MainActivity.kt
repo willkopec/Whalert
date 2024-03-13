@@ -3,34 +3,38 @@ package com.willkopec.whalert
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.willkopec.mvvmnewsappincompose.homescreen.ScreenContent
-import com.willkopec.whalert.ui.theme.WhalertTheme
+import com.willkopec.whalert.homescreen.HomeScreen
+import com.willkopec.whalert.ui.theme.MVVMNewsAppInComposeTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+data class BottomNavigationItem(
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unSelectedIcon: ImageVector,
+    val hasNews: Boolean,
+    val badgeCount: Int? = null
+    )
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    //private val viewModel:NewsViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
-            WhalertTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    RootNavigationGraph(navController = rememberNavController())
-                }
+            MVVMNewsAppInComposeTheme {
+                RootNavigationGraph(navController = rememberNavController())
             }
         }
+
     }
 }
 
@@ -42,7 +46,7 @@ fun RootNavigationGraph(navController: NavHostController) {
         startDestination = Graph.HOME
     ) {
         composable(route = Graph.HOME) {
-            ScreenContent(name="Home", onClick = {})
+            HomeScreen()
         }
     }
 }

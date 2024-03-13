@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.willkopec.mvvmnewsappincompose"
+    namespace = "com.willkopec.whalert"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.willkopec.mvvmnewsappincompose"
+        applicationId = "com.willkopec.whalert"
         minSdk = 25
         targetSdk = 34
         versionCode = 1
