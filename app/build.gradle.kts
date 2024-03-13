@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.willkopec.whalert"
+    namespace = "com.willkopec.mvvmnewsappincompose"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.willkopec.whalert"
+        applicationId = "com.willkopec.mvvmnewsappincompose"
         minSdk = 25
         targetSdk = 34
         versionCode = 1
@@ -21,6 +21,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+
     }
 
     buildTypes {

@@ -13,5 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Whalert"
+rootProject.name = "MVVMNewsAppInCompose"
 include(":app")
+ 
