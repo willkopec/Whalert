@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.willkopec.whalert.Graph
-import com.willkopec.whalert.breakingnews.BreakingNewsScreen
 import com.willkopec.whalert.util.BottomBarScreen
 
 /*
@@ -30,10 +29,9 @@ fun HomeNavGraph(navController: NavHostController) {
         startDestination = BottomBarScreen.BreakingNews.route
     ) {
         composable(route = BottomBarScreen.BreakingNews.route) {
-            BreakingNewsScreen(
-                navController,
-                name = BottomBarScreen.BreakingNews.route,
-                onClick = { /*TODO*/}
+            ScreenContent(
+                name = BottomBarScreen.SavedNews.route,
+                onClick = {}
             )
         }
         composable(route = BottomBarScreen.SavedNews.route) {

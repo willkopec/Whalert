@@ -21,8 +21,6 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
-
-
     }
 
     buildTypes {
@@ -110,6 +108,8 @@ dependencies {
     // Coil
     implementation ("io.coil-kt:coil:1.1.1")
     implementation("io.coil-kt:coil-compose:2.2.2")
+
+    implementation("org.jsoup:jsoup:1.14.3")
 
     implementation("androidx.compose.ui:ui-tooling-preview")
 

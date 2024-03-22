@@ -1,17 +1,24 @@
 package com.willkopec.whalert
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.homescreen.HomeScreen
-import com.willkopec.whalert.ui.theme.MVVMNewsAppInComposeTheme
+import com.willkopec.whalert.ui.theme.WhalertTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.jsoup.Jsoup
 
 data class BottomNavigationItem(
     val title: String,
@@ -19,18 +26,18 @@ data class BottomNavigationItem(
     val unSelectedIcon: ImageVector,
     val hasNews: Boolean,
     val badgeCount: Int? = null
-    )
+)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    //private val viewModel:NewsViewModel by viewModels()
+    private val viewModel: WhalertViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MVVMNewsAppInComposeTheme {
+            WhalertTheme {
                 RootNavigationGraph(navController = rememberNavController())
             }
         }

@@ -64,8 +64,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.willkopec.whalert.BottomNavigationItem
 import com.willkopec.whalert.R
-import com.willkopec.whalert.breakingnews.NewsViewModel
-import com.willkopec.whalert.ui.theme.MVVMNewsAppInComposeTheme
+import com.willkopec.whalert.breakingnews.WhalertViewModel
+import com.willkopec.whalert.ui.theme.WhalertTheme
 import com.willkopec.whalert.util.BottomBarScreen
 import com.willkopec.whalert.util.Constants.Companion.APP_NAME
 
@@ -74,7 +74,7 @@ import com.willkopec.whalert.util.Constants.Companion.APP_NAME
 @Composable
 fun HomeScreen(
     navController: NavHostController = rememberNavController(),
-    viewModel: NewsViewModel = hiltViewModel()
+    viewModel: WhalertViewModel = hiltViewModel()
 ) {
 
     //var darkTheme by remember { viewModel.darkTheme }
@@ -83,7 +83,7 @@ fun HomeScreen(
     val loadError by viewModel.loadError.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    MVVMNewsAppInComposeTheme(darkTheme = darkTheme) {
+    WhalertTheme (darkTheme = darkTheme) {
         Scaffold(
             topBar = {
                 TopAppBar(
