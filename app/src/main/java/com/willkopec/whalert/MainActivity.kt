@@ -12,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.willkopec.whalert.breakingnews.WhalertViewModel
-import com.willkopec.whalert.homescreen.HomeScreen
+import com.willkopec.whalert.ui.homescreen.HomeScreen
 import com.willkopec.whalert.ui.theme.WhalertTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
