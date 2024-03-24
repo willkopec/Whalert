@@ -6,28 +6,28 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.willkopec.whalert.model.CryptoItem
+import com.willkopec.whalert.model.Roi
+import com.willkopec.whalert.repository.CoingeckoRepository
 import com.willkopec.whalert.util.Crypto
 import com.willkopec.whalert.util.MyPreference
+import com.willkopec.whalert.util.Resource
 import com.willkopec.whalert.util.SortType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.jsoup.Connection
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.select.Elements
+import javax.inject.Inject
+
 
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class WhalertViewModel
 @Inject
 constructor(
+    private val newsRepository: CoingeckoRepository,
     private val myPreference: MyPreference,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -67,7 +67,6 @@ constructor(
     private val _articleDeleted = MutableLiveData<Boolean>()
     val articleDeleted: LiveData<Boolean> = _articleDeleted
 
-
     fun switchDarkMode() {
         val newValue = !_darkTheme.value
         _darkTheme.value = newValue
@@ -78,79 +77,76 @@ constructor(
         _scrollToTop.postValue(scroll)
     }
 
-    val cryptoNames = MutableLiveData<List<Crypto>>()
+    val cryptoNames = MutableLiveData<List<CryptoItem>>()
+
+    private val _breakingNews = MutableStateFlow<List<CryptoItem>>(emptyList())
+    val breakingNews: StateFlow<List<CryptoItem>> = _breakingNews
 
     init {
-        Log.d("VIEWMODEL", "SOMETHING HERE??")
-        scrapeCryptoNames(cryptoNames)
-        cryptoNames.observeForever { names ->
-            names?.forEach { name ->
-                Log.d("VIEWMODEL", "${name.symbol} ${name.price}")
+        getCryptos()
+        printList()
+    }
+
+    fun getCryptos() {
+        Log.d(TAG, "GETTING CRYPTOS")
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = newsRepository.getBreakingNews(breakingNewsPage)
+            when (result) {
+                is Resource.Success -> {
+                    val breakingNewsArticles = result.data?.map { crypto ->
+                        //Log.d(TAG, "${crypto.name}")
+                        CryptoItem(
+                            crypto.ath,
+                            crypto.ath_change_percentage,
+                            crypto.ath_date,
+                            crypto.atl,
+                            crypto.atl_change_percentage,
+                            crypto.atl_date,
+                            crypto.circulating_supply,
+                            crypto.current_price,
+                            crypto.fully_diluted_valuation,
+                            crypto.high_24h,
+                            crypto.id,
+                            crypto.image,
+                            crypto.last_updated,
+                            crypto.low_24h,
+                            crypto.market_cap,
+                            crypto.market_cap_change_24h,
+                            crypto.market_cap_change_percentage_24h,
+                            crypto.market_cap_rank,
+                            crypto.max_supply,
+                            crypto.name,
+                            crypto.price_change_24h,
+                            crypto.price_change_percentage_24h,
+                            crypto.roi,
+                            crypto.symbol,
+                            crypto.total_supply,
+                            crypto.total_volume
+                        )
+                    } ?: emptyList()
+
+                    _loadError.value = ""
+                    _isLoading.value = false
+                    breakingNewsPage++
+                    _breakingNews.value += breakingNewsArticles
+                }
+                is Resource.Error -> {
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
+                }
+                else -> {}
             }
         }
     }
 
-    fun scrapeCryptoNames(cryptoLiveData: MutableLiveData<List<Crypto>>) {
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                // Fetch the webpage
-                val url = "https://coinmarketcap.com/"
-                val doc: Document = Jsoup.connect(url).get()
-
-                // Select the table containing crypto names
-                val table: Elements = doc.select("table.sc-14cb040a-3.dsflYb.cmc-table")
-
-                // Extract the rows from the table
-                val rows: Elements = table.select("tbody > tr")
-
-                val cryptoList = mutableListOf<Crypto>()
-
-                // Iterate over each row and extract the crypto data
-                for (row in rows) {
-                    // Extracting data from each row
-                    val rankText: String = row.select("td:nth-child(1)").text()
-                    val rank: Int? = if (rankText.isNotBlank()) rankText.toIntOrNull() else null
-                    val cryptoName: String = row.select("td:nth-child(2)").text()
-                    val cryptoSymbol: String = row.select("td:nth-child(3)").text()
-                    val cryptoPrice: String = row.select("td:nth-child(4)").text()
-
-                    // Create a Crypto object and add it to the list
-                    val crypto = Crypto(cryptoName, cryptoSymbol, cryptoPrice)
-                    cryptoList.add(crypto)
-                }
-
-                // Update the MutableLiveData with the new list of cryptocurrencies
-                cryptoLiveData.postValue(cryptoList)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    fun printList(){
+        Log.d(TAG, "SHOULD PRINT LIST")
+        _breakingNews.value.forEach {
+            Log.d(TAG, "${it.name}: ")
         }
     }
 
-    /*private fun scrapeTopCryptos() {
-        val url = "https://coinmarketcap.com/"
 
-        GlobalScope.launch(Dispatchers.IO) {
-            try {
-                val doc = Jsoup.connect(url).get()
-                val cryptoNamesList = mutableListOf<String>()
-                val rows = doc.select("tr")
-
-                for (row in rows) {
-                    val nameElement = row.select("td > a > span")
-                    val name = nameElement.text().trim()
-                    if (name.isNotEmpty()) {
-                        cryptoNamesList.add(name)
-
-                        Log.d(TAG, "${name}")
-                    }
-                }
-
-                cryptoNames.postValue(cryptoNamesList)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }*/
 }
 

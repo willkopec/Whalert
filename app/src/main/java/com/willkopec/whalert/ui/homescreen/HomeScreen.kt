@@ -99,7 +99,10 @@ fun HomeScreen(
                             darkTheme = darkTheme,
                             size = 50.dp,
                             padding = 5.dp,
-                            onClick = { viewModel.switchDarkMode() }
+                            onClick = {
+                                viewModel.switchDarkMode()
+                                viewModel.printList()
+                            }
                         )
                     }
                 )

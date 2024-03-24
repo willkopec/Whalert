@@ -1,12 +1,17 @@
 package com.willkopec.whalert
 
+import android.content.Context
 import android.os.Bundle
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -15,10 +20,7 @@ import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.ui.homescreen.HomeScreen
 import com.willkopec.whalert.ui.theme.WhalertTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.jsoup.Jsoup
 
 data class BottomNavigationItem(
     val title: String,
@@ -63,3 +65,4 @@ object Graph {
     const val HOME = "home_graph"
     const val DETAILS = "details_graph"
 }
+

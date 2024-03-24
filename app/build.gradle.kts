@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.willkopec.whalert"
-        minSdk = 25
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -48,6 +48,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/INDEX.LIST"
+            excludes += "META-INF/io.netty.versions.properties"
         }
     }
 }
@@ -95,12 +97,8 @@ dependencies {
     //Swipe
     implementation ("me.saket.swipe:swipe:1.1.1")
 
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
-
-    //implementation ("com.google.dagger:hilt-android:2.50")
-    //kapt ("com.google.dagger:hilt-android-compiler:2.50")
-    //implementation ("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-
+    implementation("org.seleniumhq.selenium:selenium-java:4.1.2")
+    implementation("org.seleniumhq.selenium:selenium-chrome-driver:4.1.2")
 
     //Timber
     implementation ("com.jakewharton.timber:timber:4.7.1")
@@ -108,8 +106,6 @@ dependencies {
     // Coil
     implementation ("io.coil-kt:coil:1.1.1")
     implementation("io.coil-kt:coil-compose:2.2.2")
-
-    implementation("org.jsoup:jsoup:1.14.3")
 
     implementation("androidx.compose.ui:ui-tooling-preview")
 
