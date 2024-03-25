@@ -1,26 +1,25 @@
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
@@ -31,35 +30,38 @@ import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.CryptoItem
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.sqrt
+
 
 @Composable
 fun DraggableBubbleScreen(
-    viewModel: WhalertViewModel = hiltViewModel()
+    viewModel: WhalertViewModel = hiltViewModel(),
+    bottomBarHeight: Int
 ) {
-    var bubbles by remember { mutableStateOf(listOf(0.1f, -0.05f)) }
     val currentCryptoBubbleList by viewModel.breakingNews.collectAsState()
+    var item: Int = 0
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        /*bubbles.forEach { percentageChange ->
-            DraggableBubble(
-                size = 50.dp,
-                percentageChange = percentageChange,
-                onDrag = { newPosition ->
-                    // Handle drag if needed
-                }
-            )
-        }*/
+        var xOffset = 0.dp // Initialize xOffset
+
         currentCryptoBubbleList.forEach {
-            DraggableBubble(
-                size = 75.dp,
-                cryptoInfo = it,
-                onDrag = { newPosition ->
-                    // Handle drag if needed
-                }
-            )
-        }
+            item++
+
+            //if(item <= 3){
+                DraggableBubble(
+                    size = 50.dp,
+                    cryptoInfo = it,
+                    position = Offset(xOffset.value, 0f), // Pass the xOffset
+                    onDrag = { newPosition ->
+                        // Handle drag if needed
+                    },
+                    bottomBarHeight = bottomBarHeight
+                )
+                xOffset += 125.dp // Increment xOffset by bubble size (75dp) + gap (50dp)
+            }
+        //}
     }
 }
 
@@ -67,20 +69,26 @@ fun DraggableBubbleScreen(
 fun DraggableBubble(
     size: Dp,
     cryptoInfo: CryptoItem,
-    onDrag: (Offset) -> Unit
+    position: Offset, // Receive position
+    onDrag: (Offset) -> Unit,
+    bottomBarHeight: Int
 ) {
     val percentageChange = cryptoInfo.price_change_percentage_24h.toFloat()
     val color = if (percentageChange >= 0) Color.Green else Color.Red
     val adjustedSize = size + (percentageChange).dp // Adjust size based on percentage change
 
-    var position by remember { mutableStateOf(Offset.Zero) }
+    var bubblePosition by remember { mutableStateOf(position) } // Use bubblePosition instead of position
+
+    val density = LocalDensity.current
+    val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
+    val screenHeight = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
 
     Box(
         modifier = Modifier
             .offset {
                 IntOffset(
-                    position.x.roundToInt(),
-                    position.y.roundToInt()
+                    bubblePosition.x.roundToInt(),
+                    bubblePosition.y.roundToInt()
                 )
             }
             .background(color, shape = CircleShape)
@@ -88,23 +96,113 @@ fun DraggableBubble(
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
                     change.consume()
-                    position += dragAmount
-                    onDrag(position)
+
+                    // Calculate new position
+                    val newX = (bubblePosition.x + dragAmount.x).coerceIn(0f, screenWidth - adjustedSize.toPx())
+                    val newY = (bubblePosition.y + dragAmount.y)
+                        .coerceIn(0f, screenHeight - adjustedSize.toPx() - bottomBarHeight.dp.toPx())
+
+                    bubblePosition = Offset(newX, newY)
+                    onDrag(bubblePosition)
                 }
             }
-    ){
-        var textSize: TextUnit = 5.sp
-        if(abs(percentageChange) > 15){
-            textSize = 3.sp
-        } else if(abs(percentageChange) > 25){
-            textSize = 4.sp
-        } else if(abs(percentageChange) > 35){
-            textSize = 5.sp
-        }
+    ) {
+        var textSize: TextUnit = 10.sp
         Text(
-            text = "${cryptoInfo.name} \n ${cryptoInfo.price_change_percentage_24h}",
+            modifier = Modifier.fillMaxWidth().align(Alignment.Center),
+            text = "${cryptoInfo.symbol.uppercase()} \n ${cryptoInfo.price_change_percentage_24h}",
             textAlign = TextAlign.Center,
-            fontSize = 12.sp
+            fontSize = textSize,
+            fontWeight = FontWeight.Bold,
+            lineHeight = 10.sp
         )
     }
 }
+
+
+
+data class Bubble(var center: Offset, val radius: Float, val color: Color, var velocity: Offset = Offset.Zero, var dragging: Boolean = false)
+
+/*@Composable
+fun DraggableBubble(defaultSize: Float,
+                    cryptoInfo: List<CryptoItem>) {
+
+    var bubbles by remember { mutableStateOf(listOf(Bubble(Offset(50f, 50f), 50f, Color.Red), Bubble(Offset(250f, 250f), 50f, Color.Blue))) }
+    var thisCount: Int = 0
+
+    cryptoInfo.map { thisCrypto ->
+        val percentageChange = thisCrypto.price_change_percentage_24h.toFloat()
+        val color = if (percentageChange >= 0) Color.Green else Color.Red
+
+        if(thisCount <= 4){
+            bubbles += Bubble(Offset(50f, 50f), defaultSize, color)
+        }
+
+        thisCount++
+
+    }
+    //listOf(Bubble(Offset(50f, 50f), 50f, Color.Red), Bubble(Offset(250f, 250f), 50f, Color.Blue))
+
+
+    Canvas(modifier = Modifier.fillMaxSize()
+        .pointerInput(Unit) {
+            detectDragGestures { change, dragAmount ->
+                bubbles = bubbles.map { bubble ->
+                    if (change.position.x in (bubble.center.x - bubble.radius)..(bubble.center.x + bubble.radius) &&
+                        change.position.y in (bubble.center.y - bubble.radius)..(bubble.center.y + bubble.radius)
+                    ) {
+                        bubble.copy(center = bubble.center + dragAmount)
+                    } else {
+                        bubble
+                    }
+                }
+            }
+        }) {
+        //drawBackground()
+        bubbles.forEachIndexed { index, bubble ->
+            val updatedBubble = calculatePosition(bubble, index, bubbles)
+            bubbles = bubbles.toMutableList().also { it[index] = updatedBubble }
+            drawCircle(updatedBubble.color, updatedBubble.radius, updatedBubble.center)
+        }
+    }
+}
+
+fun calculatePosition(bubble: Bubble, index: Int, bubbles: List<Bubble>): Bubble {
+    if (!bubble.dragging) {
+        return bubble
+    }
+
+    var newVelocity = bubble.velocity
+    var newPosition = bubble.center + bubble.velocity
+
+    for ((i, otherBubble) in bubbles.withIndex()) {
+        if (i != index) {
+            val dx = newPosition.x - otherBubble.center.x
+            val dy = newPosition.y - otherBubble.center.y
+            val distance = sqrt((dx * dx + dy * dy).toDouble())
+
+            if (distance < bubble.radius + otherBubble.radius) {
+                // Bounce off
+                val normalX = dx / distance
+                val normalY = dy / distance
+
+                val dotProduct = bubble.velocity.x * normalX + bubble.velocity.y * normalY
+                newVelocity -= Offset((dotProduct * normalX).toFloat(), (dotProduct * normalY).toFloat())
+                newVelocity *= 0.8f
+
+                newPosition += Offset((normalX * (bubble.radius + otherBubble.radius - distance)).toFloat(),
+                    (normalY * (bubble.radius + otherBubble.radius - distance)).toFloat()
+                )
+            }
+        }
+    }
+
+    return Bubble(newPosition, bubble.radius, bubble.color, newVelocity, bubble.dragging)
+}
+
+@Composable
+fun drawBackground() {
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        drawRect(Color.White)
+    }
+}*/

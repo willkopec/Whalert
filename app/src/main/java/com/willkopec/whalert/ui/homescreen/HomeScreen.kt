@@ -52,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -76,23 +77,20 @@ fun HomeScreen(
     navController: NavHostController = rememberNavController(),
     viewModel: WhalertViewModel = hiltViewModel()
 ) {
+    val bottomBarHeightPx = with(LocalDensity.current) { 56.dp.toPx() } // Convert dp to pixels
 
-    //var darkTheme by remember { viewModel.darkTheme }
-    //val loadError by remember { viewModel.loadError }
     val darkTheme by viewModel.darkTheme.collectAsState()
     val loadError by viewModel.loadError.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    WhalertTheme (darkTheme = darkTheme) {
+    WhalertTheme(darkTheme = darkTheme) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    colors =
-                    TopAppBarDefaults.topAppBarColors(
+                    colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer,
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),
-                    /*navigationIcon = ,*/
                     title = { Text(text = APP_NAME) },
                     actions = {
                         ThemeSwitcher(
@@ -107,18 +105,23 @@ fun HomeScreen(
                     }
                 )
             },
-            bottomBar = { BottomNavigation(navController) },
+            bottomBar = {
+                BottomNavigation(navController = navController)
+            },
         ) { scaffoldPadding ->
             Box(
-                modifier =
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(scaffoldPadding)
                     .consumeWindowInsets(scaffoldPadding)
                     .systemBarsPadding(),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                HomeNavGraph(navController = navController)
+                // Adjust the padding to accommodate the bottom navigation bar
+                HomeNavGraph(
+                    navController = navController,
+                    bottomBarHeight = bottomBarHeightPx.toInt() // Pass the height in pixels
+                )
             }
         }
     }

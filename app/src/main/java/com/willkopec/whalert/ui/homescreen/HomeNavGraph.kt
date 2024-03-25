@@ -20,7 +20,7 @@ import com.willkopec.whalert.util.BottomBarScreen
  */
 
 @Composable
-fun HomeNavGraph(navController: NavHostController) {
+fun HomeNavGraph(navController: NavHostController, bottomBarHeight: Int) {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -30,7 +30,7 @@ fun HomeNavGraph(navController: NavHostController) {
         startDestination = BottomBarScreen.BreakingNews.route
     ) {
         composable(route = BottomBarScreen.BreakingNews.route) {
-            DraggableBubbleScreen()
+            DraggableBubbleScreen(bottomBarHeight = bottomBarHeight)
         }
         composable(route = BottomBarScreen.SavedNews.route) {
             ScreenContent(
