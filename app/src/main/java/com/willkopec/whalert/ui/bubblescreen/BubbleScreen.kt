@@ -28,7 +28,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.CryptoItem
+import java.text.DecimalFormat
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
@@ -38,30 +40,38 @@ fun DraggableBubbleScreen(
     viewModel: WhalertViewModel = hiltViewModel(),
     bottomBarHeight: Int
 ) {
+    val density = LocalDensity.current
+    val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
     val currentCryptoBubbleList by viewModel.breakingNews.collectAsState()
     var item: Int = 0
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        var xOffset = 0.dp // Initialize xOffset
+        var xOffset = 0f // Initialize xOffset as float
+        var yOffset = 0f
 
         currentCryptoBubbleList.forEach {
             item++
 
-            //if(item <= 3){
-                DraggableBubble(
-                    size = 50.dp,
-                    cryptoInfo = it,
-                    position = Offset(xOffset.value, 0f), // Pass the xOffset
-                    onDrag = { newPosition ->
-                        // Handle drag if needed
-                    },
-                    bottomBarHeight = bottomBarHeight
-                )
-                xOffset += 125.dp // Increment xOffset by bubble size (75dp) + gap (50dp)
+            DraggableBubble(
+                size = 50.dp,
+                cryptoInfo = it,
+                position = Offset(xOffset, yOffset), // Pass the xOffset
+                onDrag = { newPosition ->
+                    // Handle drag if needed
+                },
+                bottomBarHeight = bottomBarHeight
+            )
+
+            xOffset += with(LocalDensity.current) { 75.dp.toPx() } // Increment xOffset by bubble size (75dp) + gap (50dp)
+
+            // Reset xOffset if it exceeds the screen width
+            if (xOffset + with(LocalDensity.current) { 35.dp.toPx() } > screenWidth) {
+                xOffset = 0f
+                yOffset += with(LocalDensity.current) { 75.dp.toPx() }
             }
-        //}
+        }
     }
 }
 
@@ -107,14 +117,23 @@ fun DraggableBubble(
                 }
             }
     ) {
+        val df = DecimalFormat("#.##")
+        df.maximumFractionDigits = 2
+
+        var percentText : String = df.format(cryptoInfo.price_change_percentage_24h)
+        if(cryptoInfo.price_change_percentage_24h >= 0){
+            percentText = "+${df.format(cryptoInfo.price_change_percentage_24h)}"
+        }
+
         var textSize: TextUnit = 10.sp
         Text(
             modifier = Modifier.fillMaxWidth().align(Alignment.Center),
-            text = "${cryptoInfo.symbol.uppercase()} \n ${cryptoInfo.price_change_percentage_24h}",
+            text = "${cryptoInfo.symbol.uppercase()} \n ${percentText}%",
             textAlign = TextAlign.Center,
             fontSize = textSize,
             fontWeight = FontWeight.Bold,
-            lineHeight = 10.sp
+            lineHeight = 10.sp,
+            color = Color.Black
         )
     }
 }
