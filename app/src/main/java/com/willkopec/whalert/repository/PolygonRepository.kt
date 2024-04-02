@@ -10,19 +10,17 @@ import com.willkopec.whalert.util.Resource
 import javax.inject.Inject
 
 class PolygonRepository @Inject constructor(
-
+    private val retrofitInstance: RetrofitInstance
 ) {
 
     suspend fun getSymbolData(symbol: String, from: String, to: String): Resource<PolygonResponse> {
-        val polygonRetrofit = RetrofitInstance.getInstance(Constants.POLYGON_BASE_URL)
-        val polygonApiService = polygonRetrofit.createService(PolygonAPI::class.java)
+        val polygonApiService = retrofitInstance.createService(PolygonAPI::class.java)
 
         val response = try {
-            polygonApiService.getTopCryptos(symbol,from,to)
+            polygonApiService.getTopCryptos(symbol, from, to)
         } catch (e: Exception) {
             return Resource.Error("An unknown error occurred!")
         }
         return Resource.Success(response)
     }
-
 }

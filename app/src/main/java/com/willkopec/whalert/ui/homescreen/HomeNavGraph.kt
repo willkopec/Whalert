@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.willkopec.whalert.Graph
 import com.willkopec.whalert.ui.chartscreen.BarChartExample
+import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
 import com.willkopec.whalert.util.BottomBarScreen
 
 /*
@@ -34,7 +35,7 @@ fun HomeNavGraph(navController: NavHostController, bottomBarHeight: Int) {
             DraggableBubbleScreen(bottomBarHeight = bottomBarHeight)
         }
         composable(route = BottomBarScreen.SavedNews.route) {
-            BarChartExample(timeScaleInDays = 100)
+            ChartSymbolScreen(timeScaleInDays = 100)
         }
         composable(route = BottomBarScreen.SearchNews.route) {
             ScreenContent(

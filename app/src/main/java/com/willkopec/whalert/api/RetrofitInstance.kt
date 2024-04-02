@@ -1,10 +1,10 @@
 package com.willkopec.whalert.api
 
-import com.willkopec.whalert.util.Constants.Companion.BASE_URL
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.HashMap
 
 class RetrofitInstance private constructor(baseUrl: String) {
 
@@ -21,19 +21,16 @@ class RetrofitInstance private constructor(baseUrl: String) {
             .build()
     }
 
-    companion object {
-
-        @Volatile
-        private var instance: RetrofitInstance? = null
-
-        fun getInstance(baseUrl: String): RetrofitInstance {
-            return instance ?: synchronized(this) {
-                instance ?: RetrofitInstance(baseUrl).also { instance = it }
-            }
-        }
-    }
-
     fun <T> createService(service: Class<T>): T {
         return retrofit.create(service)
+    }
+
+    companion object {
+
+        private val instances: MutableMap<String, RetrofitInstance> = HashMap()
+
+        fun getInstance(baseUrl: String): RetrofitInstance {
+            return instances.getOrPut(baseUrl) { RetrofitInstance(baseUrl) }
+        }
     }
 }

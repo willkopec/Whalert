@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.willkopec.whalert.api.RetrofitInstance
+import com.willkopec.whalert.api.RetrofitQualifiers
 import com.willkopec.whalert.model.coingecko.CryptoItem
 import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.repository.CoingeckoRepository
@@ -32,13 +34,16 @@ import javax.inject.Inject
 class WhalertViewModel
 @Inject
 constructor(
-    private val coinGeckoRepo: CoingeckoRepository,
-    private val polygonRepo: PolygonRepository,
+    @RetrofitQualifiers.CoinGeckoRetrofitInstance retrofitInstanceCoinGecko: RetrofitInstance,
+    @RetrofitQualifiers.PolygonRetrofitInstance retrofitInstancePolygon: RetrofitInstance,
     private val myPreference: MyPreference,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     val TAG = "VIEWMODEL"
+
+    private val coinGeckoRepo: CoingeckoRepository = CoingeckoRepository(retrofitInstanceCoinGecko)
+    private val polygonRepo: PolygonRepository = PolygonRepository(retrofitInstancePolygon)
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -88,13 +93,72 @@ constructor(
     private val _breakingNews = MutableStateFlow<List<CryptoItem>>(emptyList())
     val breakingNews: StateFlow<List<CryptoItem>> = _breakingNews
 
-    val _currentChartData = MutableStateFlow<List<Result>>(emptyList())
+    private val _currentChartData = MutableStateFlow<List<Result>>(emptyList())
     val currentChartData: StateFlow<List<Result>> = _currentChartData
 
     init {
-        //getCryptos()
-        getSymbolData("BTC",101)
+        getCryptos()
     }
+
+    fun getSymbolData(symbol: String, daysPriorToToday: Int) {
+        var daysUntilToday: Int = daysPriorToToday
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = polygonRepo.getSymbolData(
+                convertToApiSymbolString(symbol),
+                getDateBeforeDays(daysPriorToToday),
+                getCurrentDate()
+            )
+            when (result) {
+                is Resource.Success -> {
+                    val currentChartDataa = result.data?.results?.map {
+                        //Log.d(TAG, "${it.c}")
+                        daysUntilToday--
+                        Result(
+                            it.c,
+                            it.h,
+                            it.l,
+                            it.n,
+                            it.o,
+                            it.t,
+                            it.v,
+                            getDateBeforeDays(daysUntilToday)
+                        )
+                    } ?: emptyList()
+
+                    _loadError.value = ""
+                    _isLoading.value = false
+                    _currentChartData.value += currentChartDataa
+                    Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")
+                }
+                is Resource.Error -> {
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
+                }
+                else -> {}
+            }
+        }
+    }
+
+    private fun printListAfterDataAvailable() {
+        viewModelScope.launch {
+            _currentChartData.collect { data ->
+                if (!data.isNullOrEmpty()) {
+                    printList()
+                    // You may choose to cancel this coroutine job if needed
+                }
+            }
+        }
+        Log.d(TAG, "SIZE: ${currentChartData.value.size}")
+    }
+
+    fun printList() {
+        Log.d(TAG, "SHOULD PRINT LIST")
+        _currentChartData.value?.forEach {
+            Log.d(TAG, "${it.c}")
+        }
+    }
+
 
     fun getCryptos() {
         viewModelScope.launch {
@@ -148,52 +212,6 @@ constructor(
         }
     }
 
-
-
-    fun printList(){
-        Log.d(TAG, "SHOULD PRINT LIST")
-        currentChartData.value.forEach {
-            Log.d(TAG, "${it.c}")
-        }
-    }
-
-    fun getSymbolData(symbol: String, daysPriorToToday: Int) {
-        var daysUntilToday: Int = daysPriorToToday
-        viewModelScope.launch {
-            _isLoading.value = true
-            val result = polygonRepo.getSymbolData(
-                convertToApiSymbolString(symbol),
-                getDateBeforeDays(daysPriorToToday),
-                getCurrentDate()
-            )
-            when (result) {
-                is Resource.Success -> {
-                    val currentChartDataa = result.data?.results?.map {
-                        daysUntilToday--
-                        Result(
-                            it.c,
-                            it.h,
-                            it.l,
-                            it.n,
-                            it.o,
-                            it.t,
-                            it.v,
-                            getDateBeforeDays(daysUntilToday)
-                        )
-                    } ?: emptyList()
-
-                    _loadError.value = ""
-                    _isLoading.value = false
-                    _currentChartData.value = currentChartDataa
-                }
-                is Resource.Error -> {
-                    _loadError.value = result.message ?: ""
-                    _isLoading.value = false
-                }
-                else -> {}
-            }
-        }
-    }
 
 
 }

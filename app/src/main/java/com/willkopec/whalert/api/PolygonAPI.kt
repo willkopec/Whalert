@@ -1,6 +1,7 @@
 package com.willkopec.whalert.api
 
 import com.willkopec.whalert.model.polygon.PolygonResponse
+import com.willkopec.whalert.util.Constants.Companion.POLYGON_API
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -13,7 +14,7 @@ interface PolygonAPI {
         @Path("symbol") symbol: String,
         @Path("from") from: String,
         @Path("to") to: String,
-        @Query("apiKey") api: String = "p7c8V21Cyw6jFzkxVm6DjVuaromXeTpo"
+        @Query("apiKey") api: String = POLYGON_API
     ): PolygonResponse
 
 }
