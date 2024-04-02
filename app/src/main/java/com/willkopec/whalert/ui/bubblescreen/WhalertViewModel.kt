@@ -2,17 +2,22 @@ package com.willkopec.whalert.breakingnews
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.willkopec.whalert.model.CryptoItem
-import com.willkopec.whalert.model.Roi
+import com.willkopec.whalert.model.coingecko.CryptoItem
+import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.repository.CoingeckoRepository
-import com.willkopec.whalert.util.Crypto
+import com.willkopec.whalert.repository.PolygonRepository
+import com.willkopec.whalert.util.DateUtil.getCurrentDate
+import com.willkopec.whalert.util.DateUtil.getDateBeforeDays
+import com.willkopec.whalert.util.DateUtil.getDateBeforeMonths
 import com.willkopec.whalert.util.MyPreference
 import com.willkopec.whalert.util.Resource
 import com.willkopec.whalert.util.SortType
+import com.willkopec.whalert.util.SymbolUtils.convertToApiSymbolString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +32,8 @@ import javax.inject.Inject
 class WhalertViewModel
 @Inject
 constructor(
-    private val newsRepository: CoingeckoRepository,
+    private val coinGeckoRepo: CoingeckoRepository,
+    private val polygonRepo: PolygonRepository,
     private val myPreference: MyPreference,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -82,20 +88,22 @@ constructor(
     private val _breakingNews = MutableStateFlow<List<CryptoItem>>(emptyList())
     val breakingNews: StateFlow<List<CryptoItem>> = _breakingNews
 
+    val _currentChartData = MutableStateFlow<List<Result>>(emptyList())
+    val currentChartData: StateFlow<List<Result>> = _currentChartData
+
     init {
-        getCryptos()
-        printList()
+        //getCryptos()
+        getSymbolData("BTC",101)
     }
 
     fun getCryptos() {
-        Log.d(TAG, "GETTING CRYPTOS")
         viewModelScope.launch {
             _isLoading.value = true
-            val result = newsRepository.getBreakingNews(breakingNewsPage)
+            val result = coinGeckoRepo.getCryptoList(breakingNewsPage)
             when (result) {
                 is Resource.Success -> {
                     val breakingNewsArticles = result.data?.map { crypto ->
-                        //Log.d(TAG, "${crypto.name}")
+                        Log.d(TAG, "${crypto.name}")
                         CryptoItem(
                             crypto.ath,
                             crypto.ath_change_percentage,
@@ -140,10 +148,50 @@ constructor(
         }
     }
 
+
+
     fun printList(){
         Log.d(TAG, "SHOULD PRINT LIST")
-        _breakingNews.value.forEach {
-            Log.d(TAG, "${it.name}: ")
+        currentChartData.value.forEach {
+            Log.d(TAG, "${it.c}")
+        }
+    }
+
+    fun getSymbolData(symbol: String, daysPriorToToday: Int) {
+        var daysUntilToday: Int = daysPriorToToday
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = polygonRepo.getSymbolData(
+                convertToApiSymbolString(symbol),
+                getDateBeforeDays(daysPriorToToday),
+                getCurrentDate()
+            )
+            when (result) {
+                is Resource.Success -> {
+                    val currentChartDataa = result.data?.results?.map {
+                        daysUntilToday--
+                        Result(
+                            it.c,
+                            it.h,
+                            it.l,
+                            it.n,
+                            it.o,
+                            it.t,
+                            it.v,
+                            getDateBeforeDays(daysUntilToday)
+                        )
+                    } ?: emptyList()
+
+                    _loadError.value = ""
+                    _isLoading.value = false
+                    _currentChartData.value = currentChartDataa
+                }
+                is Resource.Error -> {
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
+                }
+                else -> {}
+            }
         }
     }
 

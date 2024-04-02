@@ -6,22 +6,34 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitInstance {
+class RetrofitInstance private constructor(baseUrl: String) {
 
-    companion object{
+    private val retrofit: Retrofit
 
-        private val retrofit by lazy{
-
-            val logging = HttpLoggingInterceptor()
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY)
-            val client = OkHttpClient.Builder().addInterceptor(logging).build()
-            Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).client(client).build()
-        }
-
-        val api by lazy {
-            retrofit.create(CoingeckoAPI::class.java)
-        }
-
+    init {
+        val logging = HttpLoggingInterceptor()
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+        val client = OkHttpClient.Builder().addInterceptor(logging).build()
+        retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
     }
 
+    companion object {
+
+        @Volatile
+        private var instance: RetrofitInstance? = null
+
+        fun getInstance(baseUrl: String): RetrofitInstance {
+            return instance ?: synchronized(this) {
+                instance ?: RetrofitInstance(baseUrl).also { instance = it }
+            }
+        }
+    }
+
+    fun <T> createService(service: Class<T>): T {
+        return retrofit.create(service)
+    }
 }

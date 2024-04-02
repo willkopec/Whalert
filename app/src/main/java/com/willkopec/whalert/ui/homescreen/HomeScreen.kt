@@ -134,15 +134,15 @@ fun BottomNavigation(navController: NavHostController) {
     val items =
         listOf(
             BottomNavigationItem(
-                title = "Breaking News",
-                selectedIcon = ImageVector.vectorResource(R.drawable.ic_breaking_news),
-                unSelectedIcon = ImageVector.vectorResource(R.drawable.ic_breaking_news),
+                title = "Bubble Chart",
+                selectedIcon = ImageVector.vectorResource(R.drawable.baseline_bubble_chart_24),
+                unSelectedIcon = ImageVector.vectorResource(R.drawable.baseline_bubble_chart_24),
                 hasNews = false
             ),
             BottomNavigationItem(
-                title = "Saved News",
-                selectedIcon = ImageVector.vectorResource(R.drawable.ic_favorite),
-                unSelectedIcon = ImageVector.vectorResource(R.drawable.ic_favorite),
+                title = "Charts",
+                selectedIcon = ImageVector.vectorResource(R.drawable.baseline_candlestick_chart_24),
+                unSelectedIcon = ImageVector.vectorResource(R.drawable.baseline_candlestick_chart_24),
                 hasNews = false,
             ),
             BottomNavigationItem(

@@ -1,7 +1,9 @@
 package com.willkopec.whalert.repository
 
+import com.willkopec.whalert.api.CoingeckoAPI
 import com.willkopec.whalert.api.RetrofitInstance
-import com.willkopec.whalert.model.CryptoResponse
+import com.willkopec.whalert.model.coingecko.CryptoResponse
+import com.willkopec.whalert.util.Constants.Companion.BASE_URL
 import com.willkopec.whalert.util.Resource
 import javax.inject.Inject
 
@@ -11,11 +13,14 @@ class CoingeckoRepository @Inject constructor(
 
 ) {
 
-    suspend fun getBreakingNews(pageNumber: Int) : Resource<CryptoResponse> {
+    suspend fun getCryptoList(pageNumber: Int): Resource<CryptoResponse> {
+        val coingeckoRetrofit = RetrofitInstance.getInstance(BASE_URL)
+        val coingeckoApiService = coingeckoRetrofit.createService(CoingeckoAPI::class.java)
+
         val response = try {
-            RetrofitInstance.api.getBreakingNews()
-        } catch (e: Exception){
-            return Resource.Error("An unknown error occured!")
+            coingeckoApiService.getTopCryptos()
+        } catch (e: Exception) {
+            return Resource.Error("An unknown error occurred!")
         }
         return Resource.Success(response)
     }
