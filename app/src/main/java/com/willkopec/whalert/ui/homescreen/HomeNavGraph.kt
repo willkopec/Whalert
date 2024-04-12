@@ -35,7 +35,7 @@ fun HomeNavGraph(navController: NavHostController, bottomBarHeight: Int) {
             DraggableBubbleScreen(bottomBarHeight = bottomBarHeight)
         }
         composable(route = BottomBarScreen.SavedNews.route) {
-            ChartSymbolScreen(timeScaleInDays = 100)
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight)
         }
         composable(route = BottomBarScreen.SearchNews.route) {
             ScreenContent(

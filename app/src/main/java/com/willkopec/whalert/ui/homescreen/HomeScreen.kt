@@ -115,7 +115,7 @@ fun HomeScreen(
                     .padding(scaffoldPadding)
                     .consumeWindowInsets(scaffoldPadding)
                     .systemBarsPadding(),
-                contentAlignment = Alignment.BottomCenter
+                contentAlignment = Alignment.Center
             ) {
                 // Adjust the padding to accommodate the bottom navigation bar
                 HomeNavGraph(

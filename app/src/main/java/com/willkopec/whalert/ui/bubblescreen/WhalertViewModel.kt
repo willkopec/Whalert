@@ -13,6 +13,7 @@ import com.willkopec.whalert.model.coingecko.CryptoItem
 import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.repository.CoingeckoRepository
 import com.willkopec.whalert.repository.PolygonRepository
+import com.willkopec.whalert.ui.chartscreen.getHtmlContent
 import com.willkopec.whalert.util.DateUtil.getCurrentDate
 import com.willkopec.whalert.util.DateUtil.getDateBeforeDays
 import com.willkopec.whalert.util.DateUtil.getDateBeforeMonths
@@ -96,8 +97,15 @@ constructor(
     private val _currentChartData = MutableStateFlow<List<Result>>(emptyList())
     val currentChartData: StateFlow<List<Result>> = _currentChartData
 
+    private val _currentChartName = MutableLiveData("")
+    val currentChartName: LiveData<String>
+        get() = _currentChartName
+
     init {
         getCryptos()
+        //getSymbolData("BTC", 101)
+        getSymbolData("BTC", 101)
+
     }
 
     fun getSymbolData(symbol: String, daysPriorToToday: Int) {
@@ -129,6 +137,7 @@ constructor(
                     _loadError.value = ""
                     _isLoading.value = false
                     _currentChartData.value += currentChartDataa
+                    _currentChartName.value = symbol
                     Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")
                 }
                 is Resource.Error -> {
