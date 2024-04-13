@@ -26,6 +26,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -95,7 +96,7 @@ constructor(
     val breakingNews: StateFlow<List<CryptoItem>> = _breakingNews
 
     private val _currentChartData = MutableStateFlow<List<Result>>(emptyList())
-    val currentChartData: StateFlow<List<Result>> = _currentChartData
+    val currentChartData: StateFlow<List<Result>> = _currentChartData.asStateFlow()
 
     private val _currentChartName = MutableLiveData("")
     val currentChartName: LiveData<String>
@@ -104,7 +105,9 @@ constructor(
     init {
         getCryptos()
         //getSymbolData("BTC", 101)
-        getSymbolData("BTC", 101)
+        if(currentChartData.value.isEmpty()){
+            getSymbolData("BTC", 101)
+        }
 
     }
 
@@ -136,7 +139,7 @@ constructor(
 
                     _loadError.value = ""
                     _isLoading.value = false
-                    _currentChartData.value += currentChartDataa
+                    _currentChartData.value = currentChartDataa
                     _currentChartName.value = symbol
                     Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")
                 }
@@ -162,7 +165,8 @@ constructor(
     }
 
     fun printList() {
-        Log.d(TAG, "SHOULD PRINT LIST")
+        Log.d(TAG, "SHOULD PRINT LIST FOR ${_currentChartName.value}")
+
         _currentChartData.value?.forEach {
             Log.d(TAG, "${it.c}")
         }
@@ -176,7 +180,7 @@ constructor(
             when (result) {
                 is Resource.Success -> {
                     val breakingNewsArticles = result.data?.map { crypto ->
-                        Log.d(TAG, "${crypto.name}")
+                        //Log.d(TAG, "${crypto.name}")
                         CryptoItem(
                             crypto.ath,
                             crypto.ath_change_percentage,

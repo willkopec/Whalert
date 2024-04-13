@@ -1,23 +1,38 @@
 package com.willkopec.whalert.ui.chartscreen
 
+import android.content.Context
 import android.util.Log
 import android.webkit.WebView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
@@ -42,6 +57,7 @@ import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.ui.homescreen.RetrySection
 import com.willkopec.whalert.util.DateUtil
+import kotlinx.coroutines.delay
 
 @Composable
 fun ChartSymbolScreen(
@@ -49,47 +65,122 @@ fun ChartSymbolScreen(
     bottomBarHeight: Int,
     viewModel: WhalertViewModel = hiltViewModel()
 ) {
-    val currentChartDataa by viewModel.currentChartData.collectAsState()
+    val currentChartData by viewModel.currentChartData.collectAsState()
     val loadError by viewModel.loadError.collectAsState()
-    val currentName = viewModel.currentChartName.observeAsState()
+    val currentName by viewModel.currentChartName.observeAsState()
 
-    LaunchedEffect(key1 = true) {
-        //viewModel.getSymbolData("BTC", 101) // Fetch data
-    }
-
-    if (loadError == "" && currentChartDataa.isNotEmpty()) {
-        Box(
+    if (loadError == "" && currentChartData.isNotEmpty()) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                //.padding(bottom = bottomBarHeight.dp) // Add padding to the bottom
+            //.padding(bottom = bottomBarHeight.dp) // Add padding to the bottom
         ) {
-            LightweightChart(currentName.value, currentChartDataa, bottomBarHeight)
+            SearchBar(
+                hint = "Search...",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(16.dp)
+            )
+            LightweightChart(currentName, currentChartData)
+            //Vico Implementation:
+            //BarChartExample(timeScaleInDays, currentChartData)
         }
-        //Vico Implementation:
-        //BarChartExample(timeScaleInDays, currentChartDataa)
+
 
     } else {
-        RetrySection(error = loadError) { }
+        RetrySection(error = loadError, onRetry = {viewModel.getSymbolData("BTC", 101)})
     }
 }
 
 @Composable
-fun LightweightChart(name: String?, currentChartDataa: List<Result>, bottomBarHeight: Int) {
-
+fun LightweightChart(
+    name: String?,
+    currentChartData: List<Result>
+) {
     val density = LocalDensity.current
     val screenHeight = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
-    val screenHeightWithoutBottomBar = screenHeight - 56;
+    val screenHeightWithoutBottomBar = screenHeight - 56
+
+    val currentChartDatas: String by remember(currentChartData) {
+        mutableStateOf(getHtmlContent(currentChartData, name, screenHeightWithoutBottomBar.toInt()))
+    }
+
+    // Create a unique identifier that changes whenever currentChartDatas changes
+    val uniqueId = remember { mutableStateOf(0) }
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                WebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    loadDataWithBaseURL(null, currentChartDatas, "text/html", "utf-8", null)
+                }
+            }, update = { webView ->
+                // Update WebView content when currentChartDatas changes
+                webView.loadDataWithBaseURL(null, currentChartDatas, "text/html", "utf-8", null)
+            })
+    }
 
 
+}
 
-    val currentChartData: String = getHtmlContent(currentChartDataa, name, screenHeightWithoutBottomBar.toInt())
+@Composable
+fun SearchBar(
+    modifier: Modifier = Modifier,
+    hint: String = "",
+    onSearch: (String) -> Unit = {},
+    viewModel: WhalertViewModel = hiltViewModel()
+){
+    var text by remember {
+        mutableStateOf("")
+    }
+    var isHintDisplayed by remember {
+        mutableStateOf(hint != "")
+    }
 
-    AndroidView(factory = { context ->
-        WebView(context).apply {
-            settings.javaScriptEnabled = true
-            loadDataWithBaseURL(null, currentChartData, "text/html", "utf-8", null)
+    Box(modifier = modifier){
+
+        BasicTextField(
+            value = text,
+            onValueChange = {
+                text = it
+                onSearch(it)
+            },
+            maxLines = 1,
+            singleLine = true,
+            /*textStyle = TextStyle(color = Color.Black),*/
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(5.dp, CircleShape)
+                .background(Color.White, CircleShape)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
+                .onFocusChanged {
+                    isHintDisplayed = !it.isFocused && text.isNotEmpty()
+                }
+        )
+        if(isHintDisplayed) {
+            Text(
+                text = hint,
+                color = Color.LightGray,
+                modifier = Modifier
+                    .padding(horizontal = 20.dp, vertical = 12.dp)
+            )
         }
-    })
+
+    }
+
+    LaunchedEffect(key1 = text) {
+        if (text.isBlank()) return@LaunchedEffect
+        delay(1500)
+        viewModel.getSymbolData(text, 500)
+        delay(500)
+        viewModel.printList()
+    }
 }
 
 fun getHtmlContent(timePriceData: List<Result>, name: String?, screenHeight: Int): String {
@@ -146,7 +237,7 @@ var container = document.createElement('div');
 document.body.appendChild(container);
 
 var width = window.screen.width;
-var height = 600;
+var height = window.screen.height - 300;
 
 var chart = LightweightCharts.createChart(container, {
 	width: width,
