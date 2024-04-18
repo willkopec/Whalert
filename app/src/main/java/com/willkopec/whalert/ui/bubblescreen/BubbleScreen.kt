@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.coingecko.CryptoItem
 import java.text.DecimalFormat
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
@@ -49,7 +50,7 @@ fun DraggableBubbleScreen(
             item++
 
             DraggableBubble(
-                size = 50.dp,
+                size = 40.dp,
                 cryptoInfo = it,
                 position = Offset(xOffset, yOffset), // Pass the xOffset
                 onDrag = { newPosition ->
@@ -58,12 +59,12 @@ fun DraggableBubbleScreen(
                 bottomBarHeight = bottomBarHeight
             )
 
-            xOffset += with(LocalDensity.current) { 75.dp.toPx() } // Increment xOffset by bubble size (75dp) + gap (50dp)
+            xOffset += with(LocalDensity.current) { 70.dp.toPx() + ((0..10).random()).dp.toPx()} // Increment xOffset by bubble size (75dp) + gap (50dp)
 
             // Reset xOffset if it exceeds the screen width
             if (xOffset + with(LocalDensity.current) { 35.dp.toPx() } > screenWidth) {
                 xOffset = 0f
-                yOffset += with(LocalDensity.current) { 75.dp.toPx() }
+                yOffset += with(LocalDensity.current) { 55.dp.toPx() + ((0..10).random()).dp.toPx()}
             }
         }
     }
@@ -79,7 +80,7 @@ fun DraggableBubble(
 ) {
     val percentageChange = cryptoInfo.price_change_percentage_24h.toFloat()
     val color = if (percentageChange >= 0) Color.Green else Color.Red
-    val adjustedSize = size + (percentageChange).dp // Adjust size based on percentage change
+    val adjustedSize = size + (abs(percentageChange) * 2).dp // Adjust size based on percentage change
 
     var bubblePosition by remember { mutableStateOf(position) } // Use bubblePosition instead of position
 

@@ -1,17 +1,16 @@
 package com.willkopec.whalert.util
 
-enum class SortType(val value: String){
-    BREAKING("Breaking News"),
-    ECONOMIC("Economic News"),
-    SPORTS("Sports News"),
-    HEALTH("Health News")
+enum class ChartType(val value: String){
+    LINE("line"),
+    CANDLE("candle"),
+    BAR("bar"),
 }
 
-fun getAllTypes(): List<SortType>{
-    return listOf(SortType.BREAKING, SortType.ECONOMIC, SortType.SPORTS, SortType.HEALTH)
+fun getAllTypes(): List<ChartType>{
+    return listOf(ChartType.LINE, ChartType.CANDLE, ChartType.BAR)
 }
 
-fun getSortType(value: String): SortType {
-    val map = SortType.values().associateBy(SortType::value)
+fun getSortType(value: String): ChartType {
+    val map = ChartType.values().associateBy(ChartType::value)
     return map[value]!!
 }

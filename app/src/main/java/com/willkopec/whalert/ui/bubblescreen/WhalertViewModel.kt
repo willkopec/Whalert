@@ -2,7 +2,6 @@ package com.willkopec.whalert.breakingnews
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,13 +12,11 @@ import com.willkopec.whalert.model.coingecko.CryptoItem
 import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.repository.CoingeckoRepository
 import com.willkopec.whalert.repository.PolygonRepository
-import com.willkopec.whalert.ui.chartscreen.getHtmlContent
+import com.willkopec.whalert.util.ChartType
 import com.willkopec.whalert.util.DateUtil.getCurrentDate
 import com.willkopec.whalert.util.DateUtil.getDateBeforeDays
-import com.willkopec.whalert.util.DateUtil.getDateBeforeMonths
 import com.willkopec.whalert.util.MyPreference
 import com.willkopec.whalert.util.Resource
-import com.willkopec.whalert.util.SortType
 import com.willkopec.whalert.util.SymbolUtils.convertToApiSymbolString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -65,12 +62,12 @@ constructor(
     private var breakingNewsPage = 1
     private var searchNewsPage = 1
 
-    private val _currentSortType = MutableStateFlow(SortType.BREAKING)
-    val currentSortType: StateFlow<SortType> = _currentSortType
+    private val _currentChartType = MutableStateFlow(ChartType.LINE)
+    val currentChartType: StateFlow<ChartType> = _currentChartType
 
     // Function to update currentSortType
-    fun setCurrentSortType(sortType: SortType) {
-        _currentSortType.value = sortType
+    fun setCurrentSortType(sortType: ChartType) {
+        _currentChartType.value = sortType
     }
 
     private val _scrollToTop = MutableLiveData(false)

@@ -56,6 +56,9 @@ import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.ui.homescreen.RetrySection
+import com.willkopec.whalert.*
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.DateUtil
 import kotlinx.coroutines.delay
 
@@ -103,7 +106,7 @@ fun LightweightChart(
     val screenHeightWithoutBottomBar = screenHeight - 56
 
     val currentChartDatas: String by remember(currentChartData) {
-        mutableStateOf(getHtmlContent(currentChartData, name, screenHeightWithoutBottomBar.toInt()))
+        mutableStateOf(getHtmlContent(currentChartData, name, "bar"))
     }
 
     // Create a unique identifier that changes whenever currentChartDatas changes
@@ -118,6 +121,9 @@ fun LightweightChart(
             factory = { context ->
                 WebView(context).apply {
                     settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    //settings.useWideViewPort = true
+                    settings.loadWithOverviewMode = true
                     loadDataWithBaseURL(null, currentChartDatas, "text/html", "utf-8", null)
                 }
             }, update = { webView ->
@@ -183,155 +189,45 @@ fun SearchBar(
     }
 }
 
-fun getHtmlContent(timePriceData: List<Result>, name: String?, screenHeight: Int): String {
-    var index = 0
+fun getHtmlContent(timePriceData: List<Result>, name: String?, chartType: String): String {
+    var indexOne = 0
+    var indexTwo = 0
 
-    val dataScript = StringBuilder()
+    val lineDataScript = StringBuilder()
     timePriceData.forEach { result ->
 
-        if(index == 0){
-            dataScript.append("{ time: '${result.date}', value: ${result.c} }")
-        } else if(index > 0){
-            dataScript.append("                    { time: '${result.date}', value: ${result.c} }")
+        if(indexOne == 0){
+            lineDataScript.append("{ time: '${result.date}', value: ${result.c} }")
+        } else if(indexOne > 0){
+            lineDataScript.append("                    { time: '${result.date}', value: ${result.c} }")
         }
 
-        if(index < timePriceData.size - 1){
-            dataScript.append(",\n")
+        if(indexOne < timePriceData.size - 1){
+            lineDataScript.append(",\n")
         }
-        index++
+        indexOne++
     }
 
+    val barDataScript = StringBuilder()
+    timePriceData.forEach { result ->
 
-    return """
-        <html>
-        <head>
-            <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-            <style>
-                html,
-                body {
-                	font-family: 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
-                	background: #f9fafb;
-                	-webkit-font-smoothing: antialiased;
-                	-moz-osx-font-smoothing: grayscale;
-                }
+        if(indexTwo == 0){
+            barDataScript.append("{ time: '${result.date}', open: ${result.o}, high: ${result.h}, low: ${result.l}, close: ${result.c} },")
+        } else if(indexTwo > 0){
+            barDataScript.append("                    { time: '${result.date}', open: ${result.o}, high: ${result.h}, low: ${result.l}, close: ${result.c} }")
+        }
 
-                .three-line-legend {
-                	width: 96px;
-                	height: 70px;
-                	position: absolute;
-                	padding: 8px;
-                	font-size: 12px;
-                	color: '#20262E';
-                	background-color: rgba(255, 255, 255, 0.23);
-                	text-align: left;
-                	z-index: 1000;
-                	pointer-events: none;
-                }
-            </style>
-        </head>
-        <body>
-            <script>
-                document.body.style.position = 'relative';
+        if(indexTwo < timePriceData.size - 1){
+            barDataScript.append(",\n")
+        }
+        indexTwo++
+    }
 
-var container = document.createElement('div');
-document.body.appendChild(container);
+    if(chartType == "bar"){
+        return getBarChart(name, barDataScript)
+    }
 
-var width = window.screen.width;
-var height = window.screen.height - 300;
-
-var chart = LightweightCharts.createChart(container, {
-	width: width,
-	height: height,
-	rightPriceScale: {
-		scaleMargins: {
-			top: 0.2,
-			bottom: 0.2,
-		},
-		borderVisible: false,
-	},
-	timeScale: {
-		borderVisible: false,
-	},
-	layout: {
-		backgroundColor: '#ffffff',
-		textColor: '#333',
-	},
-	grid: {
-		horzLines: {
-			color: '#eee',
-		},
-		vertLines: {
-			color: '#ffffff',
-		},
-	},
-});
-
-var areaSeries = chart.addAreaSeries({
-  topColor: 'rgba(255, 82, 82, 0.56)',
-  bottomColor: 'rgba(255, 82, 82, 0.04)',
-  lineColor: 'rgba(255, 82, 82, 1)',
-  lineWidth: 2,
-	symbol: 'AAPL',
-});
-
-areaSeries.setData([
-	${dataScript}
-]);
-
-const toolTipWidth = 80;
-const toolTipHeight = 80;
-const toolTipMargin = 15;
-
-// Create and style the tooltip html element
-const toolTip = document.createElement('div');
-toolTip.style = `width: 96px; height: 80px; position: absolute; display: none; padding: 8px; box-sizing: border-box; font-size: 12px; text-align: left; z-index: 1000; top: 12px; left: 12px; pointer-events: none; border: 1px solid; border-radius: 2px;font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;`;
-toolTip.style.background = 'white';
-toolTip.style.color = 'black';
-toolTip.style.borderColor = 'rgba(255, 82, 82, 1)';
-container.appendChild(toolTip);
-
-// update tooltip
-chart.subscribeCrosshairMove(param => {
-	if (
-		param.point === undefined ||
-		!param.time ||
-		param.point.x < 0 ||
-		param.point.x > container.clientWidth ||
-		param.point.y < 0 ||
-		param.point.y > container.clientHeight
-	) {
-		toolTip.style.display = 'none';
-	} else {
-		// time will be in the same format that we supplied to setData.
-		// thus it will be YYYY-MM-DD
-		const dateStr = param.time;
-		toolTip.style.display = 'block';
-		const data = param.seriesData.get(areaSeries);
-		const price = data.value !== undefined ? data.value : data.close;
-		toolTip.innerHTML = `<div style="color: ${"\${'rgba(255, 82, 82, 1)'}"}">${name}</div><div style="font-size: 14px; margin: 4px 0px; color: ${"${"black"}"}">
-			${"\${Math.round(100 * price) / 100}"}
-			</div><div style="color: ${"${"black"}"}">
-			${"\${dateStr}"}
-			</div>`;
-
-		const y = param.point.y;
-		let left = param.point.x + toolTipMargin;
-		if (left > container.clientWidth - toolTipWidth) {
-			left = param.point.x - toolTipMargin - toolTipWidth;
-		}
-
-		let top = y + toolTipMargin;
-		if (top > container.clientHeight - toolTipHeight) {
-			top = y - toolTipHeight - toolTipMargin;
-		}
-		toolTip.style.left = left + 'px';
-		toolTip.style.top = top + 'px';
-	}
-});
-            </script>
-        </body>
-        </html>
-    """.trimIndent()
+    return getStandardChartContent(name, lineDataScript)
 }
 
 @Composable
