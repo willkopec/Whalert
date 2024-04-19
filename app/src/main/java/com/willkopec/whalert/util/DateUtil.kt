@@ -30,4 +30,10 @@ object DateUtil {
         calendar.add(Calendar.YEAR, -years)
         return dateFormat.format(calendar.time)
     }
+
+    fun getDateBeforeDaysWithTime(days: Int): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, -days)
+        return "${dateFormat.format(calendar.time)}T00:00:00"
+    }
 }

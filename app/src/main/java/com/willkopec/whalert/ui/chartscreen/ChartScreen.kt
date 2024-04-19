@@ -57,6 +57,7 @@ import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.ui.homescreen.RetrySection
 import com.willkopec.whalert.*
+import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.DateUtil
@@ -94,12 +95,21 @@ fun ChartSymbolScreen(
     } else {
         RetrySection(error = loadError, onRetry = {viewModel.getSymbolData("BTC", 101)})
     }
+
+    LaunchedEffect(Unit) {
+        while(true){
+            Log.d("CHARTSCREEN", "Refreshing DATA")
+            currentName?.let { viewModel.getSymbolData(it, 1000) }
+            delay(5000)
+        }
+
+    }
 }
 
 @Composable
 fun LightweightChart(
     name: String?,
-    currentChartData: List<Result>
+    currentChartData: List<CoinAPIResultItem>
 ) {
     val density = LocalDensity.current
     val screenHeight = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
@@ -122,7 +132,7 @@ fun LightweightChart(
                 WebView(context).apply {
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
-                    //settings.useWideViewPort = true
+                    settings.useWideViewPort = true
                     settings.loadWithOverviewMode = true
                     loadDataWithBaseURL(null, currentChartDatas, "text/html", "utf-8", null)
                 }
@@ -189,7 +199,7 @@ fun SearchBar(
     }
 }
 
-fun getHtmlContent(timePriceData: List<Result>, name: String?, chartType: String): String {
+fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartType: String): String {
     var indexOne = 0
     var indexTwo = 0
 
@@ -197,9 +207,9 @@ fun getHtmlContent(timePriceData: List<Result>, name: String?, chartType: String
     timePriceData.forEach { result ->
 
         if(indexOne == 0){
-            lineDataScript.append("{ time: '${result.date}', value: ${result.c} }")
+            lineDataScript.append("{ time: '${result.time_period_start}', value: ${result.price_close} }")
         } else if(indexOne > 0){
-            lineDataScript.append("                    { time: '${result.date}', value: ${result.c} }")
+            lineDataScript.append("                    { time: '${result.time_period_start}', value: ${result.price_close} }")
         }
 
         if(indexOne < timePriceData.size - 1){
@@ -211,10 +221,11 @@ fun getHtmlContent(timePriceData: List<Result>, name: String?, chartType: String
     val barDataScript = StringBuilder()
     timePriceData.forEach { result ->
 
+
         if(indexTwo == 0){
-            barDataScript.append("{ time: '${result.date}', open: ${result.o}, high: ${result.h}, low: ${result.l}, close: ${result.c} },")
-        } else if(indexTwo > 0){
-            barDataScript.append("                    { time: '${result.date}', open: ${result.o}, high: ${result.h}, low: ${result.l}, close: ${result.c} }")
+            barDataScript.append("{ time: '${result.time_period_start}', open: ${result.price_open}, high: ${result.price_high}, low: ${result.price_low}, close: ${result.price_close} },")
+        } else {
+            barDataScript.append("                    { time: '${result.time_period_start}', open: ${result.price_open}, high: ${result.price_high}, low: ${result.price_low}, close: ${result.price_close} }")
         }
 
         if(indexTwo < timePriceData.size - 1){

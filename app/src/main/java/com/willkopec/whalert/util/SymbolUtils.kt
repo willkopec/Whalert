@@ -2,8 +2,12 @@ package com.willkopec.whalert.util
 
 object SymbolUtils {
 
-    fun convertToApiSymbolString(symbol: String): String {
+    fun convertToCoingeckoApiFormat(symbol: String): String {
         return "X:${symbol}USD"
+    }
+
+    fun convertToCoinAPIFormat(symbol: String): String {
+        return "BITSTAMP_SPOT_${symbol}_USD"
     }
 
 }

@@ -8,16 +8,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.willkopec.whalert.api.RetrofitInstance
 import com.willkopec.whalert.api.RetrofitQualifiers
+import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.model.coingecko.CryptoItem
 import com.willkopec.whalert.model.polygon.Result
+import com.willkopec.whalert.repository.CoinAPIRepository
 import com.willkopec.whalert.repository.CoingeckoRepository
 import com.willkopec.whalert.repository.PolygonRepository
 import com.willkopec.whalert.util.ChartType
 import com.willkopec.whalert.util.DateUtil.getCurrentDate
 import com.willkopec.whalert.util.DateUtil.getDateBeforeDays
+import com.willkopec.whalert.util.DateUtil.getDateBeforeDaysWithTime
 import com.willkopec.whalert.util.MyPreference
 import com.willkopec.whalert.util.Resource
-import com.willkopec.whalert.util.SymbolUtils.convertToApiSymbolString
+import com.willkopec.whalert.util.SymbolUtils.convertToCoinAPIFormat
+import com.willkopec.whalert.util.SymbolUtils.convertToCoingeckoApiFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,6 +39,7 @@ class WhalertViewModel
 constructor(
     @RetrofitQualifiers.CoinGeckoRetrofitInstance retrofitInstanceCoinGecko: RetrofitInstance,
     @RetrofitQualifiers.PolygonRetrofitInstance retrofitInstancePolygon: RetrofitInstance,
+    @RetrofitQualifiers.CoinAPIRetrofitInstance retrofitInstanceCoinAPI: RetrofitInstance,
     private val myPreference: MyPreference,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -43,6 +48,7 @@ constructor(
 
     private val coinGeckoRepo: CoingeckoRepository = CoingeckoRepository(retrofitInstanceCoinGecko)
     private val polygonRepo: PolygonRepository = PolygonRepository(retrofitInstancePolygon)
+    private val coinApiRepo: CoinAPIRepository = CoinAPIRepository(retrofitInstanceCoinAPI)
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -92,16 +98,16 @@ constructor(
     private val _breakingNews = MutableStateFlow<List<CryptoItem>>(emptyList())
     val breakingNews: StateFlow<List<CryptoItem>> = _breakingNews
 
-    private val _currentChartData = MutableStateFlow<List<Result>>(emptyList())
-    val currentChartData: StateFlow<List<Result>> = _currentChartData.asStateFlow()
+    private val _currentChartData = MutableStateFlow<List<CoinAPIResultItem>>(emptyList())
+    val currentChartData: StateFlow<List<CoinAPIResultItem>> = _currentChartData.asStateFlow()
 
     private val _currentChartName = MutableLiveData("")
     val currentChartName: LiveData<String>
         get() = _currentChartName
 
     init {
-        getCryptos()
-        //getSymbolData("BTC", 101)
+        //getCryptos()
+        getSymbolData("BTC", 1000)
         if(currentChartData.value.isEmpty()){
             getSymbolData("BTC", 101)
         }
@@ -109,28 +115,32 @@ constructor(
     }
 
     fun getSymbolData(symbol: String, daysPriorToToday: Int) {
+        //Log.d(TAG, "GETTING DATA HERE")
         var daysUntilToday: Int = daysPriorToToday
         viewModelScope.launch {
             _isLoading.value = true
-            val result = polygonRepo.getSymbolData(
-                convertToApiSymbolString(symbol),
-                getDateBeforeDays(daysPriorToToday),
-                getCurrentDate()
+            val result = coinApiRepo.getSymbolData(
+                convertToCoinAPIFormat(symbol),
+                getDateBeforeDaysWithTime(daysPriorToToday),
+                daysPriorToToday
             )
+
             when (result) {
                 is Resource.Success -> {
-                    val currentChartDataa = result.data?.results?.map {
+                    val currentChartDataa = result.data?.map {
                         //Log.d(TAG, "${it.c}")
                         daysUntilToday--
-                        Result(
-                            it.c,
-                            it.h,
-                            it.l,
-                            it.n,
-                            it.o,
-                            it.t,
-                            it.v,
-                            getDateBeforeDays(daysUntilToday)
+                        CoinAPIResultItem(
+                            it.price_close,
+                            it.price_high,
+                            it.price_low,
+                            it.price_open,
+                            it.time_close,
+                            it.time_open,
+                            it.time_period_end,
+                            it.time_period_start,
+                            it.trades_count,
+                            it.volume_traded
                         )
                     } ?: emptyList()
 
@@ -138,7 +148,7 @@ constructor(
                     _isLoading.value = false
                     _currentChartData.value = currentChartDataa
                     _currentChartName.value = symbol
-                    Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")
+                    //Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")
                 }
                 is Resource.Error -> {
                     _loadError.value = result.message ?: ""
@@ -165,7 +175,7 @@ constructor(
         Log.d(TAG, "SHOULD PRINT LIST FOR ${_currentChartName.value}")
 
         _currentChartData.value?.forEach {
-            Log.d(TAG, "${it.c}")
+            Log.d(TAG, "${it.price_close}")
         }
     }
 

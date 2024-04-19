@@ -11,4 +11,8 @@ class RetrofitQualifiers {
     @Retention(AnnotationRetention.BINARY)
     annotation class PolygonRetrofitInstance
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class CoinAPIRetrofitInstance
+
 }

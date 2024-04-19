@@ -3,6 +3,7 @@ package com.willkopec.whalert.di
 import com.willkopec.whalert.api.RetrofitInstance
 import com.willkopec.whalert.api.RetrofitQualifiers
 import com.willkopec.whalert.util.Constants.Companion.BASE_URL
+import com.willkopec.whalert.util.Constants.Companion.COIN_API_BASE_URL
 import com.willkopec.whalert.util.Constants.Companion.POLYGON_BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -25,6 +26,13 @@ object AppModule {
     @RetrofitQualifiers.PolygonRetrofitInstance
     fun providePolygonRetrofitInstance(): RetrofitInstance {
         return RetrofitInstance.getInstance(POLYGON_BASE_URL)
+    }
+
+    @Provides
+    @Singleton
+    @RetrofitQualifiers.CoinAPIRetrofitInstance
+    fun provideCoinAPIRetrofitInstance(): RetrofitInstance {
+        return RetrofitInstance.getInstance(COIN_API_BASE_URL)
     }
 
 }

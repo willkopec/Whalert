@@ -141,66 +141,91 @@ chart.subscribeCrosshairMove(param => {
         return """
         <html>
         <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Candlestick Chart</title>
             <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+            <style>
+                #chartContainer {
+                    position: relative;
+                    width: 100%;
+                    height: 550px;
+                }
+
+            #additionalContent {
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                z-index: 20;
+                background-color: #f0f0f0;
+            }
+</style>
         </head>
         <body>
+            <div id="chartContainer">
+                <div id="additionalContent">
+                    <!-- Price Information: -->
+                    <div id="priceInfo"></div>
+                </div>
+            </div>
+        
             <script>
-                var chart = LightweightCharts.createChart(document.body, {
-                  width: window.screen.width - 10,
-                  height: window.screen.height - 310,
-                	timeScale: {
-                			timeVisible: true,
-                      borderColor: '#D1D4DC',
-                		},
-                  rightPriceScale: {
-                  	borderColor: '#D1D4DC',
-                  },
-                   layout: {
-                    background: {
+                var chartContainer = document.getElementById('chartContainer');
+                var additionalContent = document.getElementById('additionalContent');
+                var priceInfo = document.getElementById('priceInfo');
+        
+                var chart = LightweightCharts.createChart(chartContainer, {
+                    width: chartContainer.offsetWidth,
+                    height: chartContainer.offsetHeight,
+                    timeScale: {
+                        timeVisible: true,
+                        borderColor: '#D1D4DC',
+                    },
+                    rightPriceScale: {
+                        borderColor: '#D1D4DC',
+                    },
+                    layout: {
+                        background: {
                             type: 'solid',
                             color: '#ffffff',
                         },
-                    textColor: '#000',
-                  },
-                  grid: {
-                    horzLines: {
-                      color: '#F0F3FA',
+                        textColor: '#000',
                     },
-                    vertLines: {
-                      color: '#F0F3FA',
+                    grid: {
+                        horzLines: {
+                            color: '#F0F3FA',
+                        },
+                        vertLines: {
+                            color: '#F0F3FA',
+                        },
                     },
-                  },
                 });
-
+        
                 var series = chart.addCandlestickSeries({
-                		upColor: 'rgb(38,166,154)',
-                		downColor: 'rgb(255,82,82)',
-                		wickUpColor: 'rgb(38,166,154)',
-                		wickDownColor: 'rgb(255,82,82)',
-                		borderVisible: false,
-                  });
+                    upColor: 'rgb(38,166,154)',
+                    downColor: 'rgb(255,82,82)',
+                    wickUpColor: 'rgb(38,166,154)',
+                    wickDownColor: 'rgb(255,82,82)',
+                    borderVisible: false,
+                });
+        
                 var data = [
                     ${dataScript}
+                    // Add your data here
                 ];
+        
                 series.setData(data);
-
-                var datesForMarkers = [data[data.length - 39], data[data.length - 19]];
-                var indexOfMinPrice = 0;
-                for (var i = 1; i < datesForMarkers.length; i++) {
-                	if (datesForMarkers[i].high < datesForMarkers[indexOfMinPrice].high) {
-                		indexOfMinPrice = i;
-                	}
-                }
-
-                var markers = [{ time: data[data.length - 48].time, position: 'aboveBar', color: '#f68410', shape: 'circle', text: 'D' }];
-                for (var i = 0; i < datesForMarkers.length; i++) {
-                	if (i !== indexOfMinPrice) {
-                		markers.push({ time: datesForMarkers[i].time, position: 'aboveBar', color: '#e91e63', shape: 'arrowDown', text: 'Sell @ ' + Math.floor(datesForMarkers[i].high + 2) });
-                	} else {
-                		markers.push({ time: datesForMarkers[i].time, position: 'belowBar', color: '#2196F3', shape: 'arrowUp', text: 'Buy @ ' + Math.floor(datesForMarkers[i].low - 2) });
-                	}
-                }
-                series.setMarkers(markers);
+        
+                chart.subscribeCrosshairMove((param) => {
+                    if (param.time) {
+                        const data = param.seriesData.get(series);
+                        priceInfo.innerHTML = 
+                            "<div>OPEN: " + data.open + "</div>" +
+                            "<div>HIGH: " + data.high + "</div>" +
+                            "<div>LOW: " + data.low + "</div>" +
+                            "<div>CLOSE: " + data.close + "</div>";
+                    }
+                });
             </script>
         </body>
         </html>
