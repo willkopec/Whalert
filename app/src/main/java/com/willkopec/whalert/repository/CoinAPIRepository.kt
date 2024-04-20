@@ -16,7 +16,7 @@ class CoinAPIRepository @Inject constructor(
         val response = try {
             coinApiService.getSymbolData(symbol)
         } catch (e: Exception) {
-            return Resource.Error("An unknown error occurred!")
+            return Resource.Error("Unknown symbol or No Network Connection!")
         }
         return Resource.Success(response)
     }

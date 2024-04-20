@@ -36,10 +36,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.MutableLiveData
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -59,6 +61,7 @@ import com.willkopec.whalert.ui.homescreen.RetrySection
 import com.willkopec.whalert.*
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.DateUtil
 import kotlinx.coroutines.delay
@@ -73,7 +76,7 @@ fun ChartSymbolScreen(
     val loadError by viewModel.loadError.collectAsState()
     val currentName by viewModel.currentChartName.observeAsState()
 
-    if (loadError == "" && currentChartData.isNotEmpty()) {
+    if (loadError == "") {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -86,42 +89,32 @@ fun ChartSymbolScreen(
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(16.dp)
             )
-            LightweightChart(currentName, currentChartData)
+            LightweightChart(currentName)
             //Vico Implementation:
             //BarChartExample(timeScaleInDays, currentChartData)
         }
 
 
     } else {
-        RetrySection(error = loadError, onRetry = {viewModel.getSymbolData("BTC", 101)})
+        RetrySection(error = loadError, onRetry = {viewModel.getSymbolData("BTC", 1000)})
     }
 
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         while(true){
             Log.d("CHARTSCREEN", "Refreshing DATA")
             currentName?.let { viewModel.getSymbolData(it, 1000) }
             delay(5000)
         }
 
-    }
+    }*/
 }
 
 @Composable
 fun LightweightChart(
     name: String?,
-    currentChartData: List<CoinAPIResultItem>
+    currentChartDataa: List<CoinAPIResultItem> = emptyList(),
+    viewModel: WhalertViewModel = hiltViewModel()
 ) {
-    val density = LocalDensity.current
-    val screenHeight = with(density) { LocalConfiguration.current.screenHeightDp.dp.toPx() }
-    val screenHeightWithoutBottomBar = screenHeight - 56
-
-    val currentChartDatas: String by remember(currentChartData) {
-        mutableStateOf(getHtmlContent(currentChartData, name, "bar"))
-    }
-
-    // Create a unique identifier that changes whenever currentChartDatas changes
-    val uniqueId = remember { mutableStateOf(0) }
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -134,11 +127,15 @@ fun LightweightChart(
                     settings.domStorageEnabled = true
                     settings.useWideViewPort = true
                     settings.loadWithOverviewMode = true
-                    loadDataWithBaseURL(null, currentChartDatas, "text/html", "utf-8", null)
+
+                    addJavascriptInterface(WebAppInterface(context, viewModel), "Android")
+
+                    loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar"), "text/html", "utf-8", null)
                 }
             }, update = { webView ->
+                //webView.data
                 // Update WebView content when currentChartDatas changes
-                webView.loadDataWithBaseURL(null, currentChartDatas, "text/html", "utf-8", null)
+                webView.loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar"), "text/html", "utf-8", null)
             })
     }
 
@@ -192,10 +189,9 @@ fun SearchBar(
 
     LaunchedEffect(key1 = text) {
         if (text.isBlank()) return@LaunchedEffect
-        delay(1500)
-        viewModel.getSymbolData(text, 500)
-        delay(500)
-        viewModel.printList()
+        delay(2400)
+        viewModel.getSymbolData(text)
+        //viewModel.printList()
     }
 }
 
@@ -235,7 +231,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
     }
 
     if(chartType == "bar"){
-        return getBarChart(name, barDataScript)
+        return getBarChartHtmlContent(name)
     }
 
     return getStandardChartContent(name, lineDataScript)

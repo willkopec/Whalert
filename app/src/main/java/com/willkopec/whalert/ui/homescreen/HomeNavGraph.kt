@@ -1,9 +1,12 @@
 package com.willkopec.whalert.ui.homescreen
 
 import DraggableBubbleScreen
+import android.webkit.WebView
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,7 +25,11 @@ import com.willkopec.whalert.util.BottomBarScreen
  */
 
 @Composable
-fun HomeNavGraph(navController: NavHostController, bottomBarHeight: Int) {
+fun HomeNavGraph(
+    navController: NavHostController,
+    bottomBarHeight: Int,
+    webView: WebView
+    ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
 

@@ -50,6 +50,7 @@ constructor(
     private val polygonRepo: PolygonRepository = PolygonRepository(retrofitInstancePolygon)
     private val coinApiRepo: CoinAPIRepository = CoinAPIRepository(retrofitInstanceCoinAPI)
 
+
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -93,7 +94,8 @@ constructor(
         _scrollToTop.postValue(scroll)
     }
 
-    val cryptoNames = MutableLiveData<List<CryptoItem>>()
+    private val _savedList = MutableStateFlow<List<String>>(emptyList())
+    val savedList: StateFlow<List<String>> = _savedList
 
     private val _breakingNews = MutableStateFlow<List<CryptoItem>>(emptyList())
     val breakingNews: StateFlow<List<CryptoItem>> = _breakingNews
@@ -106,19 +108,27 @@ constructor(
         get() = _currentChartName
 
     init {
-        //getCryptos()
-        getSymbolData("BTC", 1000)
+        getCryptos()
+        //getSymbolData("BTC", 1000)
         if(currentChartData.value.isEmpty()){
-            getSymbolData("BTC", 101)
+            getSymbolData("BTC")
         }
 
     }
 
-    fun getSymbolData(symbol: String, daysPriorToToday: Int) {
+    fun addSymbolToSaved(symbol: String): String{
+        _savedList.value += symbol
+        Log.d(TAG, "Added ${symbol} to the saved!")
+        printList(_savedList.value)
+        return "${"\"\""}"
+    }
+
+    fun getSymbolData(symbol: String, daysPriorToToday: Int = 1) {
         //Log.d(TAG, "GETTING DATA HERE")
         var daysUntilToday: Int = daysPriorToToday
         viewModelScope.launch {
-            _isLoading.value = true
+            _isLoading.value = false
+            _currentChartName.value = symbol
             val result = coinApiRepo.getSymbolData(
                 convertToCoinAPIFormat(symbol),
                 getDateBeforeDaysWithTime(daysPriorToToday),
@@ -127,9 +137,12 @@ constructor(
 
             when (result) {
                 is Resource.Success -> {
-                    val currentChartDataa = result.data?.map {
+
+                    _isLoading.value = false
+                    _currentChartName.value = symbol
+                    _loadError.value = ""
+                    /*val currentChartDataa = result.data?.map {
                         //Log.d(TAG, "${it.c}")
-                        daysUntilToday--
                         CoinAPIResultItem(
                             it.price_close,
                             it.price_high,
@@ -148,7 +161,7 @@ constructor(
                     _isLoading.value = false
                     _currentChartData.value = currentChartDataa
                     _currentChartName.value = symbol
-                    //Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")
+                    //Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")*/
                 }
                 is Resource.Error -> {
                     _loadError.value = result.message ?: ""
@@ -159,23 +172,11 @@ constructor(
         }
     }
 
-    private fun printListAfterDataAvailable() {
-        viewModelScope.launch {
-            _currentChartData.collect { data ->
-                if (!data.isNullOrEmpty()) {
-                    printList()
-                    // You may choose to cancel this coroutine job if needed
-                }
-            }
-        }
-        Log.d(TAG, "SIZE: ${currentChartData.value.size}")
-    }
-
-    fun printList() {
+    fun printList(currentList: List<String>) {
         Log.d(TAG, "SHOULD PRINT LIST FOR ${_currentChartName.value}")
 
-        _currentChartData.value?.forEach {
-            Log.d(TAG, "${it.price_close}")
+        currentList.forEach {
+            Log.d(TAG, "${it}")
         }
     }
 

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.util.Log
+import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -34,13 +35,15 @@ data class BottomNavigationItem(
 class MainActivity : ComponentActivity() {
 
     private val viewModel: WhalertViewModel by viewModels()
+    private lateinit var webView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        webView = WebView(this)
 
         setContent {
             WhalertTheme {
-                RootNavigationGraph(navController = rememberNavController())
+                RootNavigationGraph(navController = rememberNavController(), webView = webView)
             }
         }
 
@@ -48,14 +51,17 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun RootNavigationGraph(navController: NavHostController) {
+fun RootNavigationGraph(
+    navController: NavHostController,
+    webView: WebView
+    ) {
     NavHost(
         navController = navController,
         route = Graph.ROOT,
         startDestination = Graph.HOME
     ) {
         composable(route = Graph.HOME) {
-            HomeScreen()
+            HomeScreen(webView)
         }
     }
 }

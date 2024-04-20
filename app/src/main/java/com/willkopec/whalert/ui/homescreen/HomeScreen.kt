@@ -1,6 +1,7 @@
 package com.willkopec.whalert.ui.homescreen
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -74,6 +75,7 @@ import com.willkopec.whalert.util.Constants.Companion.APP_NAME
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
+    webView: WebView,
     navController: NavHostController = rememberNavController(),
     viewModel: WhalertViewModel = hiltViewModel()
 ) {
@@ -99,7 +101,7 @@ fun HomeScreen(
                             padding = 5.dp,
                             onClick = {
                                 viewModel.switchDarkMode()
-                                viewModel.printList()
+                                //viewModel.printList()
                             }
                         )
                     }
@@ -120,7 +122,8 @@ fun HomeScreen(
                 // Adjust the padding to accommodate the bottom navigation bar
                 HomeNavGraph(
                     navController = navController,
-                    bottomBarHeight = bottomBarHeightPx.toInt() // Pass the height in pixels
+                    bottomBarHeight = bottomBarHeightPx.toInt(), // Pass the height in pixels
+                    webView = webView
                 )
             }
         }

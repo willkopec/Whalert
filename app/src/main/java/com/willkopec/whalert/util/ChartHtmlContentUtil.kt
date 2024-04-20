@@ -231,4 +231,156 @@ chart.subscribeCrosshairMove(param => {
         </html>
     """.trimIndent()
     }
+
+    fun getBarChartHtmlContent(symbol: String?): String{
+        return """
+        <html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Chart Example</title>
+    <!-- Include Lightweight Charts library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+			#chartContainer {
+                    position: relative;
+                    width: 100%;
+                    height: 550px;
+                }
+
+            #additionalContent {
+                position: absolute;
+                top: 50px;
+                left: 5px;
+                z-index: 20;
+                background-color: #f0f0f0;
+            }
+        /* Add your custom styles here */
+        .buttons-container {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+        }
+        .buttons-container button {
+            all: initial;
+            font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+            font-size: 14px;
+            font-style: normal;
+            font-weight: 510;
+            line-height: 24px; /* 150% */
+            letter-spacing: -0.32px;
+            padding: 8px 24px;
+            color: rgba(19, 23, 34, 1);
+            background-color: rgba(240, 243, 250, 1);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .buttons-container button:hover {
+            background-color: rgba(224, 227, 235, 1);
+        }
+        .buttons-container button:active {
+            background-color: rgba(209, 212, 220, 1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Container for the chart and buttons -->
+    <div id="chartContainer">
+    <!-- Buttons container -->
+    <div class="buttons-container">
+        <!-- Button to scroll to real-time -->
+        <button id="realtimeButton">Go to realtime</button>
+        <!-- Button to add to favorites -->
+        <button id="addToFavoritesButton">Add to Favorites</button>
+    </div>
+    <div id="additionalContent">
+        <!-- Price Information: -->
+        <div id="priceInfo"></div>
+    </div>
+</div>
+
+    <script>
+        // Initialize the chart
+        const chartOptions = {
+            layout: {
+                textColor: 'black',
+                background: { type: 'solid', color: 'white' },
+            },
+            height: 500, // Increased height for better visualization
+        };
+        const container = document.getElementById('chartContainer');
+        const chart = LightweightCharts.createChart(container, chartOptions);
+
+        // Add candlestick series to the chart
+        const series = chart.addCandlestickSeries({
+            upColor: '#26a69a',
+            downColor: '#ef5350',
+            borderVisible: false,
+            wickUpColor: '#26a69a',
+            wickDownColor: '#ef5350',
+        });
+
+        // Function to fetch data from the API endpoint
+        async function fetchDataAndUpdateChart() {
+            try {
+                const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_${symbol}_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2022-05-20T00%3A00%3A00&limit=700');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data: ' + response.statusText);
+                }
+                const apiData = await response.json();
+                updateChartWithNewData(apiData);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Function to update the chart with new data
+        function updateChartWithNewData(newData) {
+            const candleData = newData.map(item => ({
+                time: item.time_period_start,
+                open: item.price_open,
+                high: item.price_high,
+                low: item.price_low,
+                close: item.price_close,
+            }));
+            series.setData(candleData);
+        }
+
+        // Function to scroll to real-time data
+        function scrollToRealTime() {
+            chart.timeScale().scrollToRealTime();
+        }
+		
+		function addToFavorites() {
+             // Invoke the addToFavorites method of the JavaScript interface
+             Android.addToFavorites("$symbol");
+        }
+
+        // Fetch data from the API and update the chart every 5 seconds
+        fetchDataAndUpdateChart();
+        setInterval(fetchDataAndUpdateChart, 5000);
+
+        // Add event listener to the real-time button
+        const realtimeButton = document.getElementById('realtimeButton');
+        realtimeButton.addEventListener('click', scrollToRealTime);
+		
+		const addToFavoritesButton = document.getElementById('addToFavoritesButton');
+		addToFavoritesButton.addEventListener('click', addToFavorites);
+		
+		chart.subscribeCrosshairMove((param) => {
+                    if (param.time) {
+                        const data = param.seriesData.get(series);
+                        priceInfo.innerHTML = 
+                            "<div>OPEN: " + data.open + "</div>" +
+                            "<div>HIGH: " + data.high + "</div>" +
+                            "<div>LOW: " + data.low + "</div>" +
+                            "<div>CLOSE: " + data.close + "</div>";
+                    }
+                });
+		
+    </script>
+</body>
+</html>
+    """.trimIndent()
+    }
 }
