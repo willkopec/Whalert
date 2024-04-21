@@ -1,5 +1,7 @@
 package com.willkopec.whalert.util
 
+import com.willkopec.whalert.util.DateUtil.getDateBeforeDays
+import com.willkopec.whalert.util.DateUtil.getDateBeforeDaysWithTime
 import java.lang.StringBuilder
 
 object ChartHtmlContentUtil {
@@ -232,7 +234,7 @@ chart.subscribeCrosshairMove(param => {
     """.trimIndent()
     }
 
-    fun getBarChartHtmlContent(symbol: String?): String{
+    fun getBarChartHtmlContent(symbol: String?, days: Int): String{
         return """
         <html>
 <head>
@@ -323,7 +325,7 @@ chart.subscribeCrosshairMove(param => {
         // Function to fetch data from the API endpoint
         async function fetchDataAndUpdateChart() {
             try {
-                const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_${symbol}_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2022-05-20T00%3A00%3A00&limit=700');
+                const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_${symbol}_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}');
                 if (!response.ok) {
                     throw new Error('Failed to fetch data: ' + response.statusText);
                 }
@@ -351,9 +353,15 @@ chart.subscribeCrosshairMove(param => {
             chart.timeScale().scrollToRealTime();
         }
 		
-		function addToFavorites() {
-             // Invoke the addToFavorites method of the JavaScript interface
-             Android.addToFavorites("$symbol");
+		function addToOrDeleteFromFavorites() {
+            // Invoke the isInFavorites method of the JavaScript interface
+            if (Android.isInFavorites("$symbol")) {
+                // Symbol is already in favorites, delete it
+                Android.deleteFromFavorites("$symbol");
+            } else {
+                // Symbol is not in favorites, add it
+                Android.addToFavorites("$symbol");
+            }
         }
 
         // Fetch data from the API and update the chart every 5 seconds
@@ -365,7 +373,7 @@ chart.subscribeCrosshairMove(param => {
         realtimeButton.addEventListener('click', scrollToRealTime);
 		
 		const addToFavoritesButton = document.getElementById('addToFavoritesButton');
-		addToFavoritesButton.addEventListener('click', addToFavorites);
+		addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
 		
 		chart.subscribeCrosshairMove((param) => {
                     if (param.time) {

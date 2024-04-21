@@ -1,6 +1,7 @@
 package com.willkopec.whalert.api
 
 import com.willkopec.whalert.model.coingecko.CryptoResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 

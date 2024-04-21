@@ -14,4 +14,18 @@ class WebAppInterface(private val context: Context, private val viewModel: Whale
         viewModel.addSymbolToSaved(symbol)
         Toast.makeText(context, "Added to favorites: $symbol", Toast.LENGTH_SHORT).show()
     }
+
+    @JavascriptInterface
+    fun deleteFromFavorites(symbol: String) {
+        // Here you can add the symbol to your ViewModel or perform any other action in your app
+        // For example:
+        viewModel.deleteSymbolFromSaved(symbol)
+        Toast.makeText(context, "Deleted to favorites: $symbol", Toast.LENGTH_SHORT).show()
+    }
+
+    @JavascriptInterface
+    fun isInFavorites(symbol: String): Boolean {
+        return viewModel.isInFavoritesList(symbol)
+    }
+
 }

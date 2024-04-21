@@ -15,6 +15,7 @@ import androidx.navigation.navigation
 import com.willkopec.whalert.Graph
 import com.willkopec.whalert.ui.chartscreen.BarChartExample
 import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
+import com.willkopec.whalert.ui.favoriteslistscreen.FavoritesListScreen
 import com.willkopec.whalert.util.BottomBarScreen
 
 /*
@@ -45,10 +46,7 @@ fun HomeNavGraph(
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight)
         }
         composable(route = BottomBarScreen.SearchNews.route) {
-            ScreenContent(
-                name = BottomBarScreen.SavedNews.route,
-                onClick = {}
-            )
+            FavoritesListScreen(navController)
         }
 
         detailsNavGraph(navController = navController)

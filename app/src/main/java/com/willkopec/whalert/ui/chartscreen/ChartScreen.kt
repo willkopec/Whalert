@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
@@ -27,6 +28,8 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -64,6 +67,7 @@ import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.DateUtil
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 
 @Composable
@@ -231,7 +235,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
     }
 
     if(chartType == "bar"){
-        return getBarChartHtmlContent(name)
+        return getBarChartHtmlContent(name, 700)
     }
 
     return getStandardChartContent(name, lineDataScript)
@@ -239,42 +243,53 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
 
 @Composable
 fun BarChartExample(
+    symbol: String,
     timeScaleInDays: Int,
-    currentChartData: List<Result>
+    viewModelScope: CoroutineScope = rememberCoroutineScope(),
+    viewModel: WhalertViewModel = hiltViewModel()
 ) {
     val modelProducer = remember { ChartEntryModelProducer() }
     val datasetForModel = remember { mutableStateListOf(listOf<FloatEntry>()) }
     val datasetLineSpec = remember { arrayListOf<LineChart.LineSpec>() }
     val scrollState = rememberChartScrollState()
 
-    SideEffect {
-        if (currentChartData.isNotEmpty()) {
-            datasetForModel.clear()
-            datasetLineSpec.clear()
-            var xPos = 0f
-            val dataPoints = arrayListOf<FloatEntry>()
-            datasetLineSpec.add(
-                LineChart.LineSpec(
-                    lineColor = Green.toArgb(),
-                    lineBackgroundShader = DynamicShaders.fromBrush(
-                        brush = Brush.verticalGradient(
-                            listOf(
-                                Green.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_START),
-                                Green.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_END)
+    val currentChartData = remember { mutableStateOf<List<CoinAPIResultItem>>(emptyList()) }
+
+    LaunchedEffect(key1 = symbol, key2 = timeScaleInDays) {
+        viewModel.getSymbolDataForPreview(symbol, timeScaleInDays).collect { data ->
+            currentChartData.value = data
+
+            if (data.isNotEmpty()) {
+                Log.d("CHARTSCREEN", "CURRENT CHART DATA NOT EMPTY")
+                datasetForModel.clear()
+                datasetLineSpec.clear()
+                var xPos = 0f
+                val dataPoints = arrayListOf<FloatEntry>()
+                datasetLineSpec.add(
+                    LineChart.LineSpec(
+                        lineColor = Green.toArgb(),
+                        lineBackgroundShader = DynamicShaders.fromBrush(
+                            brush = Brush.verticalGradient(
+                                listOf(
+                                    Green.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_START),
+                                    Green.copy(DefaultAlpha.LINE_BACKGROUND_SHADER_END)
+                                )
                             )
                         )
                     )
                 )
-            )
 
-            currentChartData.forEachIndexed { index, result ->
-                val yFloatValue = result.c.toFloat()
-                dataPoints.add(FloatEntry(x = xPos, y = yFloatValue))
-                xPos += 1f
+                data.forEachIndexed { index, result ->
+                    val yFloatValue = result.price_close.toFloat()
+                    dataPoints.add(FloatEntry(x = xPos, y = yFloatValue))
+                    xPos += 1f
+                }
+
+                datasetForModel.add(dataPoints)
+                modelProducer.setEntries(datasetForModel)
+            } else {
+                // Handle empty data scenario if needed
             }
-
-            datasetForModel.add(dataPoints)
-            modelProducer.setEntries(datasetForModel)
         }
     }
 
@@ -289,38 +304,38 @@ fun BarChartExample(
                     .fillMaxWidth()
                     .height(500.dp)
             ) {*/
-                ProvideChartStyle {
+            ProvideChartStyle {
 
-                    Chart(
-                        modifier = Modifier.fillMaxSize(),
-                        chart = lineChart(
-                            lines = datasetLineSpec
-                        ),
-                        chartModelProducer = modelProducer,
-                        startAxis = rememberStartAxis(
-                            title = "Top Values",
-                            tickLength = 0.dp,
-                            valueFormatter = { value, _ ->
-                                ((value.toInt()) + 1).toString()
-                            },
-                            itemPlacer = AxisItemPlacer.Vertical.default(
-                                maxItemCount = 8
-                            )
-                        ),
-                        bottomAxis = rememberBottomAxis(
-                            title = "Count of values",
-                            tickLength = 0.dp,
-                            valueFormatter = { value, _ ->
-                                val index = (value.toInt()) + 1
-                                DateUtil.getDateBeforeDays(timeScaleInDays - index + 1)
-                            },
-                            itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true, spacing = 4, offset = 3)
-                        ),
+                Chart(
+                    modifier = Modifier.fillMaxSize(),
+                    chart = lineChart(
+                        lines = datasetLineSpec
+                    ),
+                    chartModelProducer = modelProducer,
+                    startAxis = rememberStartAxis(
+                        title = "Top Values",
+                        tickLength = 0.dp,
+                        valueFormatter = { value, _ ->
+                            ((value.toInt()) + 1).toString()
+                        },
+                        itemPlacer = AxisItemPlacer.Vertical.default(
+                            maxItemCount = 8
+                        )
+                    ),
+                    bottomAxis = rememberBottomAxis(
+                        title = "Count of values",
+                        tickLength = 0.dp,
+                        valueFormatter = { value, _ ->
+                            val index = (value.toInt()) + 1
+                            DateUtil.getDateBeforeDays(timeScaleInDays - index + 1)
+                        },
+                        itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true, spacing = 4, offset = 3)
+                    ),
 
-                        chartScrollState = scrollState,
-                        isZoomEnabled = true
-                    )
-                }
+                    chartScrollState = scrollState,
+                    isZoomEnabled = true
+                )
+            }
             //}
         }
     }

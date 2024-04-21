@@ -46,7 +46,7 @@ fun DraggableBubbleScreen(
         var xOffset = 0f // Initialize xOffset as float
         var yOffset = 0f
 
-        currentCryptoBubbleList.forEach {
+        currentCryptoBubbleList?.forEach {
             item++
 
             DraggableBubble(

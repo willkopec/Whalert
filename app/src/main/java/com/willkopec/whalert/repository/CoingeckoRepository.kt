@@ -1,5 +1,6 @@
 package com.willkopec.whalert.repository
 
+import android.util.Log
 import com.willkopec.whalert.api.CoingeckoAPI
 import com.willkopec.whalert.api.RetrofitInstance
 import com.willkopec.whalert.model.coingecko.CryptoResponse
@@ -19,6 +20,7 @@ class CoingeckoRepository @Inject constructor(
         val response = try {
             coingeckoApiService.getTopCryptos()
         } catch (e: Exception) {
+            Log.d("CoingeckoRepo", e.printStackTrace().toString())
             return Resource.Error("An unknown error occurred!")
         }
         return Resource.Success(response)
