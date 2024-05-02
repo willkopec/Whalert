@@ -37,7 +37,7 @@ fun DraggableBubbleScreen(
 ) {
     val density = LocalDensity.current
     val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
-    val currentCryptoBubbleList by viewModel.breakingNews.collectAsState()
+    val currentCryptoBubbleList by viewModel.bubbleList.collectAsState()
     var item: Int = 0
 
     Box(

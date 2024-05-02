@@ -11,6 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
@@ -34,8 +35,6 @@ data class BottomNavigationItem(
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private val viewModel: WhalertViewModel by viewModels()
     private lateinit var webView: WebView
 
     override fun onCreate(savedInstanceState: Bundle?) {

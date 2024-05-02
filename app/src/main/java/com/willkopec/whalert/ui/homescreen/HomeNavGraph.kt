@@ -13,6 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.willkopec.whalert.Graph
+import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.ui.chartscreen.BarChartExample
 import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
 import com.willkopec.whalert.ui.favoriteslistscreen.FavoritesListScreen
@@ -29,7 +30,8 @@ import com.willkopec.whalert.util.BottomBarScreen
 fun HomeNavGraph(
     navController: NavHostController,
     bottomBarHeight: Int,
-    webView: WebView
+    webView: WebView,
+    viewModel: WhalertViewModel
     ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -40,7 +42,7 @@ fun HomeNavGraph(
         startDestination = BottomBarScreen.BreakingNews.route
     ) {
         composable(route = BottomBarScreen.BreakingNews.route) {
-            DraggableBubbleScreen(bottomBarHeight = bottomBarHeight)
+            DraggableBubbleScreen(bottomBarHeight = bottomBarHeight, viewModel = viewModel)
         }
         composable(route = BottomBarScreen.SavedNews.route) {
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight)

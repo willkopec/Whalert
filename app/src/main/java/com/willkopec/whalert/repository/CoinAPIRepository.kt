@@ -14,7 +14,7 @@ class CoinAPIRepository @Inject constructor(
         val coinApiService = retrofitInstance.createService(CoinAPI::class.java)
 
         val response = try {
-            coinApiService.getSymbolData(symbol)
+            coinApiService.getSymbolData(symbol=symbol, start=start, limitQuery=limit)
         } catch (e: Exception) {
             return Resource.Error("Unknown symbol or No Network Connection!")
         }

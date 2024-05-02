@@ -123,7 +123,8 @@ fun HomeScreen(
                 HomeNavGraph(
                     navController = navController,
                     bottomBarHeight = bottomBarHeightPx.toInt(), // Pass the height in pixels
-                    webView = webView
+                    webView = webView,
+                    viewModel = viewModel
                 )
             }
         }
@@ -149,9 +150,9 @@ fun BottomNavigation(navController: NavHostController) {
                 hasNews = false,
             ),
             BottomNavigationItem(
-                title = "Search News",
-                selectedIcon = ImageVector.vectorResource(R.drawable.baseline_search_24),
-                unSelectedIcon = ImageVector.vectorResource(R.drawable.baseline_search_24),
+                title = "Dashboard",
+                selectedIcon = ImageVector.vectorResource(R.drawable.baseline_dashboard_customize_24),
+                unSelectedIcon = ImageVector.vectorResource(R.drawable.baseline_dashboard_customize_24),
                 hasNews = false,
             ),
         )

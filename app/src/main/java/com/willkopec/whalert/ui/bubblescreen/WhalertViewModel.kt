@@ -6,31 +6,39 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.willkopec.whalert.api.RetrofitInstance
 import com.willkopec.whalert.api.RetrofitQualifiers
 import com.willkopec.whalert.breakingnews.CryptoCache.cachedCryptoItems
+import com.willkopec.whalert.breakingnews.CryptoCache.cachedFavoritesData
 import com.willkopec.whalert.datastore.PreferenceDatastore
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.model.coingecko.CryptoItem
 import com.willkopec.whalert.repository.CoinAPIRepository
 import com.willkopec.whalert.repository.CoingeckoRepository
 import com.willkopec.whalert.repository.PolygonRepository
+import com.willkopec.whalert.util.BottomBarScreen
 import com.willkopec.whalert.util.ChartType
 import com.willkopec.whalert.util.DateUtil.getDateBeforeDaysWithTime
+import com.willkopec.whalert.util.IndicatorUtil.getRiskLevel
 import com.willkopec.whalert.util.MyPreference
 import com.willkopec.whalert.util.Resource
 import com.willkopec.whalert.util.SymbolUtils.convertToCoinAPIFormat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 object CryptoCache {
     var cachedCryptoItems: List<CryptoItem> = emptyList()
+    var cachedFavoritesData: MutableMap<String, List<CoinAPIResultItem>?> = mutableMapOf()
 }
 
 @HiltViewModel
@@ -89,8 +97,11 @@ constructor(
     private var _savedList = MutableStateFlow<Set<String>>(emptySet())
     val savedList: StateFlow<Set<String>> = _savedList
 
-    private val _breakingNews = MutableStateFlow<List<CryptoItem>>(cachedCryptoItems)
-    val breakingNews: StateFlow<List<CryptoItem>> = _breakingNews
+    private var _savedListData = MutableStateFlow<Map<String, List<CoinAPIResultItem>?>>(cachedFavoritesData)
+    val savedListData: StateFlow<Map<String, List<CoinAPIResultItem>?>> = _savedListData
+
+    private val _bubbleList = MutableStateFlow<List<CryptoItem>>(cachedCryptoItems)
+    val bubbleList: StateFlow<List<CryptoItem>> = _bubbleList
 
     private val _currentChartData = MutableStateFlow<List<CoinAPIResultItem>>(emptyList())
     val currentChartData: StateFlow<List<CoinAPIResultItem>> = _currentChartData.asStateFlow()
@@ -105,8 +116,12 @@ constructor(
                 _darkTheme.value = userPreferences.darkMode
                 _currentChartName.value = userPreferences.currentSymbol
                 _savedList.value = userPreferences.favoritesList
-            }
 
+                if(cachedFavoritesData.size < _savedList.value.size){
+                    Log.d(TAG, "SHOULD ONLY DO THIS ONCE")
+                    getFavoritesData(50, 350)
+                }
+            }
         }
         if(cachedCryptoItems.isEmpty()){
             Log.d(TAG, "EMPTY")
@@ -114,6 +129,7 @@ constructor(
         }
 
 
+        printFavoritesData()
     }
 
     fun switchDarkMode() {
@@ -166,12 +182,160 @@ constructor(
         return isInFavories
     }
 
+    fun getSymbolDataPreview(symbol: String): CryptoItem? {
+
+        _bubbleList.value.forEach {
+            //Log.d(TAG, "$symbol - $it")
+            if(it.symbol.uppercase() == symbol.uppercase()){
+                return it
+            }
+        }
+        return null
+    }
+
+    fun setCurrentSymbol(symbol: String){
+        viewModelScope.launch {
+            preferenceDatastore.setCurrentSymbol(symbol)
+        }
+    }
+    fun updateSymbolAndNavigate(symbol: String, navController: NavController) {
+        viewModelScope.launch {
+            setCurrentSymbol(symbol)
+            navController.navigate(BottomBarScreen.SavedNews.route)
+        }
+    }
+
+    fun getFavoritesData(periodOne: Int, periodTwo: Int) {
+        viewModelScope.launch {
+            Log.d(TAG, "getting DATA ${savedList.value.size}")
+            _savedList.value.forEach {
+
+                if (cachedFavoritesData[it] == null || cachedFavoritesData[it]?.isEmpty() == true) {
+                    Log.d(TAG, "size = 0 $it")
+                    val result = coinApiRepo.getSymbolData(
+                        convertToCoinAPIFormat(it),
+                        getDateBeforeDaysWithTime(5000),
+                        5000
+                    )
+
+                    when (result) {
+                        is Resource.Success -> {
+                            Log.d(TAG, "GOT HERE ADDING $it")
+                            _isLoading.value = false
+
+                            val priceCloseList = result.data?.reversed()?.mapNotNull { it.price_close }
+                            //get the periodOne SMA for the daily
+                            val smaList1 = priceCloseList?.windowed(periodOne, 1) { it.average() }
+                            //get the periodTwo SMA for the weekly (every 7th day)
+                            val smaList2 = priceCloseList?.windowed(periodTwo, 1) { it.average() }
+
+                            // Calculate SMA and update CoinAPIResultItem objects
+                            val updatedData = result.data?.reversed()?.mapIndexed { index, dataItem ->
+                                CoinAPIResultItem(
+                                    dataItem.price_close,
+                                    dataItem.price_high,
+                                    dataItem.price_low,
+                                    dataItem.price_open,
+                                    dataItem.time_close,
+                                    dataItem.time_open,
+                                    dataItem.time_period_end,
+                                    dataItem.time_period_start,
+                                    dataItem.trades_count,
+                                    dataItem.volume_traded,
+                                    smaList1?.getOrNull(index) ?: 0.0, // Replace 0.0 with a default value if needed
+                                    smaList2?.getOrNull(index) ?: 0.0  // Replace 0.0 with a default value if needed
+                                )
+                            }
+
+                            updatedData?.get(0)?.current_risk = updatedData?.let { it1 ->
+                                getRiskLevel(
+                                    it1
+                                )
+                            }
+
+                            // Update cachedFavoritesData with the updated data
+                            cachedFavoritesData[it] = updatedData ?: emptyList()
+
+                            /*val currentChartDataa = updatedData?.map { coinApiResultItem ->
+                                CoinAPIResultItem(
+                                    coinApiResultItem.price_close,
+                                    coinApiResultItem.price_high,
+                                    coinApiResultItem.price_low,
+                                    coinApiResultItem.price_open,
+                                    coinApiResultItem.time_close,
+                                    coinApiResultItem.time_open,
+                                    coinApiResultItem.time_period_end,
+                                    coinApiResultItem.time_period_start,
+                                    coinApiResultItem.trades_count,
+                                    coinApiResultItem.volume_traded,
+                                    coinApiResultItem.sma
+                                )
+                            } ?: emptyList()
+
+                            _loadError.value = ""
+                            _isLoading.value = false
+                            _currentChartData.value = currentChartDataa
+                            _currentChartName.value = symbol*/
+                        }
+                        is Resource.Error -> {
+                            Log.d(TAG, "GOT HERE - ERROR")
+                            //_loadError.value = result.message ?: ""
+                            //_isLoading.value = false
+                            //_currentChartName.value = ""
+                        }
+                        else -> {}
+                    }
+                    delay(100)
+                } else {
+                    //Log.d(TAG, "${cachedFavoritesData[it].toString()}")
+                }
+
+            }
+            //printFavoritesData()
+        }
+    }
+
+    fun printFavoritesData(){
+        var index: Int = 0
+        for ((key, value) in cachedFavoritesData) {
+            if(value?.size!! >= 351){
+                Log.d(TAG, "$key - ${value?.get(0)?.time_close} Risk Level: ${value.get(0).current_risk}"/**/)
+            }
+
+            /*value?.forEach {
+                Log.d(TAG, "${it.time_period_start} : ${it.price_close}")
+            }*/
+        }
+    }
+
+    fun simpleMovingAverageData(period: Int): Map<String, List<Double>> {
+        val favoritesSMAmap: MutableMap<String, List<Double>> = mutableMapOf()
+        for ((key, value) in cachedFavoritesData) {
+            value?.let { list ->
+                val priceCloseList: List<Double> = list.map { it.price_close }
+                val smaList = priceCloseList.windowed(period, 1) { it.average() }
+
+                smaList.forEach {
+                    Log.d(TAG, "Current value: ${it.toString()}")
+                }
+
+                // Update the original list with the SMA values
+                cachedFavoritesData[key] = list.mapIndexed { index, item ->
+                    item.copy(current_sma1 = smaList.getOrNull(index) ?: 0.0)
+                }
+
+                favoritesSMAmap[key] = smaList
+            }
+        }
+        return favoritesSMAmap
+    }
+
     fun getSymbolData(symbol: String, daysPriorToToday: Int = 1) {
         Log.d(TAG, "GETTING DATA HERE")
         var daysUntilToday: Int = daysPriorToToday
         viewModelScope.launch {
             _isLoading.value = false
-            preferenceDatastore.setCurrentSymbol(symbol)
+            setCurrentSymbol(symbol)
 
             val result = coinApiRepo.getSymbolData(
                 convertToCoinAPIFormat(symbol),
@@ -183,8 +347,9 @@ constructor(
                 is Resource.Success -> {
 
                     _isLoading.value = false
-                    //_currentChartName.value = symbol
+                    _currentChartName.value = symbol
                     _loadError.value = ""
+                    Log.d(TAG, "Success")
                     /*val currentChartDataa = result.data?.map {
                         //Log.d(TAG, "${it.c}")
                         CoinAPIResultItem(
@@ -208,9 +373,10 @@ constructor(
                     //Log.d(TAG, "HERE 2 : ${_currentChartData.value.size}")*/
                 }
                 is Resource.Error -> {
-                    _loadError.value = result.message ?: ""
+                    _loadError.value = result.message ?: "Symbol not found or no internet connection."
                     _isLoading.value = false
                     _currentChartName.value = ""
+                    Log.d(TAG, "Error - ${_loadError.value}")
                 }
                 else -> {}
             }
@@ -287,7 +453,7 @@ constructor(
                 is Resource.Success -> {
                     cachedCryptoItems = result.data ?: emptyList()
                     _loadError.value = ""
-                    _breakingNews.value = cachedCryptoItems
+                    _bubbleList.value = cachedCryptoItems
                 }
                 is Resource.Error -> {
                     _loadError.value = result.message ?: "An unknown error occurred"

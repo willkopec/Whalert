@@ -12,7 +12,7 @@ class RetrofitInstance private constructor(baseUrl: String) {
 
     init {
         val logging = HttpLoggingInterceptor()
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+        //logging.setLevel(HttpLoggingInterceptor.Level.BODY)
         val client = OkHttpClient.Builder().addInterceptor(logging).build()
         retrofit = Retrofit.Builder()
             .baseUrl(baseUrl)

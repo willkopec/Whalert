@@ -10,5 +10,8 @@ data class CoinAPIResultItem(
     val time_period_end: String,
     val time_period_start: String,
     val trades_count: Int,
-    val volume_traded: Double
+    val volume_traded: Double,
+    val current_sma1: Double? = null,
+    val current_sma2: Double? = null,
+    var current_risk: Double? = null
 )

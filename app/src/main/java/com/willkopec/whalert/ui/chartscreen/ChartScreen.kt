@@ -65,6 +65,7 @@ import com.willkopec.whalert.*
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChartHtmlContent
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.DateUtil
 import kotlinx.coroutines.CoroutineScope
@@ -79,28 +80,31 @@ fun ChartSymbolScreen(
     val currentChartData by viewModel.currentChartData.collectAsState()
     val loadError by viewModel.loadError.collectAsState()
     val currentName by viewModel.currentChartName.observeAsState()
+    val darkTheme by viewModel.darkTheme.collectAsState()
 
-    if (loadError == "") {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-            //.padding(bottom = bottomBarHeight.dp) // Add padding to the bottom
-        ) {
-            SearchBar(
-                hint = "Search...",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(16.dp)
-            )
-            LightweightChart(currentName)
-            //Vico Implementation:
-            //BarChartExample(timeScaleInDays, currentChartData)
+    Log.d("ChartScreen", "$currentName ${loadError}")
+
+    // Check if there's an error, and display the RetrySection if needed
+    if (loadError.isNotBlank()) {
+        RetrySection(error = loadError) {
+            // Retry callback, handle retry logic here if needed
+            viewModel.getSymbolData("BTC", 1000)
         }
+        return
+    }
 
-
-    } else {
-        RetrySection(error = loadError, onRetry = {viewModel.getSymbolData("BTC", 1000)})
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        SearchBar(
+            hint = "Search...",
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(16.dp)
+        )
+        LightweightChart(name = currentName, viewModel = viewModel, darkTheme = darkTheme)
+        // Other UI elements...
     }
 
     /*LaunchedEffect(Unit) {
@@ -117,7 +121,8 @@ fun ChartSymbolScreen(
 fun LightweightChart(
     name: String?,
     currentChartDataa: List<CoinAPIResultItem> = emptyList(),
-    viewModel: WhalertViewModel = hiltViewModel()
+    viewModel: WhalertViewModel = hiltViewModel(),
+    darkTheme: Boolean = false
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -134,12 +139,12 @@ fun LightweightChart(
 
                     addJavascriptInterface(WebAppInterface(context, viewModel), "Android")
 
-                    loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar"), "text/html", "utf-8", null)
+                    loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar", darkTheme), "text/html", "utf-8", null)
                 }
             }, update = { webView ->
                 //webView.data
                 // Update WebView content when currentChartDatas changes
-                webView.loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar"), "text/html", "utf-8", null)
+                webView.loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar", darkTheme), "text/html", "utf-8", null)
             })
     }
 
@@ -199,7 +204,7 @@ fun SearchBar(
     }
 }
 
-fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartType: String): String {
+fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartType: String, darkTheme: Boolean = false): String {
     var indexOne = 0
     var indexTwo = 0
 
@@ -234,8 +239,10 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
         indexTwo++
     }
 
-    if(chartType == "bar"){
+    if(chartType == "bar" && !darkTheme){
         return getBarChartHtmlContent(name, 700)
+    } else if(chartType == "bar" && darkTheme){
+        return getDarkModeBarChartHtmlContent(name, 700)
     }
 
     return getStandardChartContent(name, lineDataScript)
