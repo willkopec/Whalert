@@ -145,14 +145,17 @@ constructor(
     }
 
     // Example function to observe dark mode preference
-    fun observeDarkModePreference() {
+    fun observeDarkModePreference(): Boolean {
+        var isDarkMode: Boolean = false
         viewModelScope.launch {
+
             preferenceDatastore.getDetails().collect { userPreferences ->
                 // Handle the retrieved user preferences here
-                val isDarkMode = userPreferences.darkMode
+                isDarkMode = userPreferences.darkMode
                 // Do something with the dark mode preference
             }
         }
+        return isDarkMode
     }
 
     fun updateScrollToTop(scroll: Boolean) {

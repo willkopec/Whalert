@@ -6,46 +6,43 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.squareup.moshi.Moshi
+import androidx.navigation.compose.rememberNavController
+import com.willkopec.whalert.BottomNavigationItem
 import com.willkopec.whalert.R
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.model.coingecko.CryptoItem
-import com.willkopec.whalert.ui.chartscreen.BarChartExample
-import com.willkopec.whalert.util.BottomBarScreen
-import kotlinx.coroutines.delay
 
 @Composable
 fun FavoritesListScreen(
@@ -62,6 +59,7 @@ fun FavoritesListScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            dashboardHeader()
             // Legend
             Legend()
 
@@ -111,7 +109,9 @@ fun FavoritesListItem(
             verticalAlignment = Alignment.CenterVertically // Center items vertically
         ) {
             Column(
-                modifier = Modifier.weight(0.65f).padding(horizontal = 16.dp) // Add horizontal padding
+                modifier = Modifier
+                    .weight(0.65f)
+                    .padding(horizontal = 16.dp) // Add horizontal padding
             ) {
                 Text(
                     text = symbol,
@@ -126,7 +126,9 @@ fun FavoritesListItem(
             }
 
             Column(
-                modifier = Modifier.weight(0.4f).padding(horizontal = 16.dp) // Add horizontal padding
+                modifier = Modifier
+                    .weight(0.4f)
+                    .padding(horizontal = 16.dp) // Add horizontal padding
             ) {
                 if (indicatorData != null) {
                     indicatorData[0].current_risk?.let { RiskLevelChip(it) }
@@ -134,7 +136,9 @@ fun FavoritesListItem(
             }
 
             Column(
-                modifier = Modifier.weight(0.7f).padding(horizontal = 16.dp) // Add horizontal padding
+                modifier = Modifier
+                    .weight(0.7f)
+                    .padding(horizontal = 16.dp) // Add horizontal padding
             ) {
                 if (cryptoInfo != null) {
                     Text(
@@ -244,6 +248,99 @@ fun RiskLevelChip(riskLevel: Double){
     }
 }
 
+@Composable
+fun dashboardHeader(){
+
+    var dashboardItems: List<DashboardItem> = listOf(
+        DashboardItem(
+        title = "Indicators",
+        selectedIcon = R.drawable.baseline_line_axis_24,
+        unSelectedIcon = R.drawable.baseline_line_axis_24
+        ),
+        DashboardItem(
+            title = "DCA Simulator",
+            selectedIcon = R.drawable.baseline_price_check_24,
+            unSelectedIcon = R.drawable.baseline_price_check_24
+        ),
+        DashboardItem(
+            title = "Tools",
+            selectedIcon = R.drawable.baseline_bubble_chart_24,
+            unSelectedIcon = R.drawable.baseline_bubble_chart_24
+        ),
+        DashboardItem(
+            title = "Analytics",
+            selectedIcon = R.drawable.baseline_query_stats_24,
+            unSelectedIcon = R.drawable.baseline_query_stats_24
+        ),
+        DashboardItem(
+            title = "Sentiment",
+            selectedIcon = R.drawable.baseline_textsms_24,
+            unSelectedIcon = R.drawable.baseline_textsms_24
+        ),
+        )
+
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .height(120.dp)
+        .clip(RoundedCornerShape(5.dp))
+        .background(color = Color.LightGray)
+    ) {
+        LazyColumn(contentPadding = PaddingValues(16.dp)) {
+
+            val itemCount = dashboardItems.size / 5 + if (dashboardItems.size % 5 == 0) 0 else 1
+
+            items(itemCount) {
+                IndicatorRows(rowIndex = it, entries = dashboardItems)
+            }
+
+        }
+    }
+}
+
+@Composable
+fun IndicatorRows(
+    rowIndex: Int,
+    entries: List<DashboardItem>,
+    navContoller: NavController = rememberNavController()
+) {
+    Column {
+        Row {
+            for (i in 0 until 5) {
+                Column(modifier = Modifier.align(Alignment.CenterVertically)) {
+                    if (rowIndex * 5 + i < entries.size) {
+
+                        Image(
+                            painter = painterResource(entries[rowIndex * 5 + i].unSelectedIcon),
+                            contentDescription = "Content description for visually impaired",
+                            contentScale = ContentScale.FillWidth,
+                            modifier = Modifier
+                                .size(30.dp)
+                        )
+
+                        Text(
+                            text = "${entries[rowIndex * 5 + i].title}",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+
+
+                    }
+                }
+                Spacer(modifier = Modifier.width(20.dp))
+
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+data class DashboardItem(
+    val title: String,
+    val selectedIcon: Int,
+    val unSelectedIcon: Int
+)
 
 
 
