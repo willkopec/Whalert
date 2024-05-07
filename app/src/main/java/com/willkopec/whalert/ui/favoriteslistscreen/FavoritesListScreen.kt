@@ -1,5 +1,6 @@
 package com.willkopec.whalert.ui.favoriteslistscreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,16 +38,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.willkopec.whalert.BottomNavigationItem
 import com.willkopec.whalert.R
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.model.coingecko.CryptoItem
+import com.willkopec.whalert.util.BottomBarScreen
+import com.willkopec.whalert.util.DashboardNavigation
 
 @Composable
 fun FavoritesListScreen(
-    navController: NavController,
+    navController: NavHostController,
     viewModel: WhalertViewModel = hiltViewModel()
 ) {
 
@@ -59,7 +64,7 @@ fun FavoritesListScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            dashboardHeader()
+            dashboardHeader(navController=navController)
             // Legend
             Legend()
 
@@ -249,39 +254,20 @@ fun RiskLevelChip(riskLevel: Double){
 }
 
 @Composable
-fun dashboardHeader(){
+fun dashboardHeader(navController: NavHostController){
 
-    var dashboardItems: List<DashboardItem> = listOf(
-        DashboardItem(
-        title = "Indicators",
-        selectedIcon = R.drawable.baseline_line_axis_24,
-        unSelectedIcon = R.drawable.baseline_line_axis_24
-        ),
-        DashboardItem(
-            title = "DCA Simulator",
-            selectedIcon = R.drawable.baseline_price_check_24,
-            unSelectedIcon = R.drawable.baseline_price_check_24
-        ),
-        DashboardItem(
-            title = "Tools",
-            selectedIcon = R.drawable.baseline_bubble_chart_24,
-            unSelectedIcon = R.drawable.baseline_bubble_chart_24
-        ),
-        DashboardItem(
-            title = "Analytics",
-            selectedIcon = R.drawable.baseline_query_stats_24,
-            unSelectedIcon = R.drawable.baseline_query_stats_24
-        ),
-        DashboardItem(
-            title = "Sentiment",
-            selectedIcon = R.drawable.baseline_textsms_24,
-            unSelectedIcon = R.drawable.baseline_textsms_24
-        ),
-        )
+    var dashboardItems: List<DashboardNavigation> =
+    listOf(
+        DashboardNavigation.IndicatorsPage,
+        DashboardNavigation.DcaSimulator,
+        DashboardNavigation.ToolsPage,
+        DashboardNavigation.AnalyticsPage,
+        DashboardNavigation.SentimentPage
+    )
 
     Box(modifier = Modifier
         .fillMaxWidth()
-        .height(120.dp)
+        .height(80.dp)
         .clip(RoundedCornerShape(5.dp))
         .background(color = Color.LightGray)
     ) {
@@ -290,7 +276,7 @@ fun dashboardHeader(){
             val itemCount = dashboardItems.size / 5 + if (dashboardItems.size % 5 == 0) 0 else 1
 
             items(itemCount) {
-                IndicatorRows(rowIndex = it, entries = dashboardItems)
+                IndicatorRows(rowIndex = it, entries = dashboardItems, navController=navController)
             }
 
         }
@@ -300,17 +286,25 @@ fun dashboardHeader(){
 @Composable
 fun IndicatorRows(
     rowIndex: Int,
-    entries: List<DashboardItem>,
-    navContoller: NavController = rememberNavController()
+    entries: List<DashboardNavigation>,
+    navController: NavHostController
 ) {
     Column {
         Row {
             for (i in 0 until 5) {
-                Column(modifier = Modifier.align(Alignment.CenterVertically)) {
+                Column(modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .clickable {
+                        navController.navigate("${BottomBarScreen.ChartsScreen.route}/picycle") {
+                        popUpTo(navController.graph.findStartDestination().id)
+                        launchSingleTop = true
+                    }
+                        Log.d("NAVIGATION", "${entries[rowIndex].route}")
+                    }) {
                     if (rowIndex * 5 + i < entries.size) {
 
                         Image(
-                            painter = painterResource(entries[rowIndex * 5 + i].unSelectedIcon),
+                            painter = painterResource(entries[rowIndex * 5 + i].icon),
                             contentDescription = "Content description for visually impaired",
                             contentScale = ContentScale.FillWidth,
                             modifier = Modifier

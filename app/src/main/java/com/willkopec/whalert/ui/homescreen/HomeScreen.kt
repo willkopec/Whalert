@@ -159,9 +159,9 @@ fun BottomNavigation(navController: NavHostController) {
 
     val screens =
         listOf(
-            BottomBarScreen.BreakingNews,
-            BottomBarScreen.SavedNews,
-            BottomBarScreen.SearchNews,
+            BottomBarScreen.BubbleCharts,
+            BottomBarScreen.ChartsScreen,
+            BottomBarScreen.DashboardScreen,
         )
 
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }

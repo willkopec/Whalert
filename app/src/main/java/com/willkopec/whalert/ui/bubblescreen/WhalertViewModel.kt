@@ -31,10 +31,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.log
 
 object CryptoCache {
     var cachedCryptoItems: List<CryptoItem> = emptyList()
@@ -204,7 +202,7 @@ constructor(
     fun updateSymbolAndNavigate(symbol: String, navController: NavController) {
         viewModelScope.launch {
             setCurrentSymbol(symbol)
-            navController.navigate(BottomBarScreen.SavedNews.route)
+            navController.navigate(BottomBarScreen.ChartsScreen.route)
         }
     }
 

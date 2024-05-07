@@ -1,20 +1,20 @@
 package com.willkopec.whalert.ui.homescreen
 
 import DraggableBubbleScreen
+import android.util.Log
 import android.webkit.WebView
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.willkopec.whalert.Graph
 import com.willkopec.whalert.breakingnews.WhalertViewModel
-import com.willkopec.whalert.ui.chartscreen.BarChartExample
 import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
 import com.willkopec.whalert.ui.favoriteslistscreen.FavoritesListScreen
 import com.willkopec.whalert.util.BottomBarScreen
@@ -39,15 +39,26 @@ fun HomeNavGraph(
     NavHost(
         navController = navController,
         route = Graph.HOME,
-        startDestination = BottomBarScreen.BreakingNews.route
+        startDestination = BottomBarScreen.BubbleCharts.route
     ) {
-        composable(route = BottomBarScreen.BreakingNews.route) {
+        composable(route = BottomBarScreen.BubbleCharts.route) {
             DraggableBubbleScreen(bottomBarHeight = bottomBarHeight, viewModel = viewModel)
         }
-        composable(route = BottomBarScreen.SavedNews.route) {
+        composable(route = BottomBarScreen.ChartsScreen.route) {
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight)
         }
-        composable(route = BottomBarScreen.SearchNews.route) {
+        composable(
+            route = "${BottomBarScreen.ChartsScreen.route}/{indicator}",
+            arguments = listOf(navArgument("indicator") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val indicator = backStackEntry.arguments?.getString("indicator")
+            Log.d("NAVGRAPH", "GOT HERE ${indicator}")
+
+            if (indicator != null) {
+                ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator = indicator)
+            }
+        }
+        composable(route = BottomBarScreen.DashboardScreen.route) {
             FavoritesListScreen(navController)
         }
 

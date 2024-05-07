@@ -66,6 +66,7 @@ import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicator
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.DateUtil
 import kotlinx.coroutines.CoroutineScope
@@ -75,7 +76,8 @@ import kotlinx.coroutines.delay
 fun ChartSymbolScreen(
     timeScaleInDays: Int,
     bottomBarHeight: Int,
-    viewModel: WhalertViewModel = hiltViewModel()
+    viewModel: WhalertViewModel = hiltViewModel(),
+    currentIndicator: String? = null
 ) {
     val currentChartData by viewModel.currentChartData.collectAsState()
     val loadError by viewModel.loadError.collectAsState()
@@ -93,28 +95,28 @@ fun ChartSymbolScreen(
         return
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        SearchBar(
-            hint = "Search...",
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(16.dp)
-        )
-        LightweightChart(name = currentName, viewModel = viewModel, darkTheme = darkTheme)
-        // Other UI elements...
+    if(currentIndicator == null){
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            SearchBar(
+                hint = "Search...",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .padding(16.dp)
+            )
+            LightweightChart(name = currentName, viewModel = viewModel, darkTheme = darkTheme)
+            // Other UI elements...
+        }
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            IndicatorsChart(name = currentIndicator, darkTheme = darkTheme)
+        }
     }
 
-    /*LaunchedEffect(Unit) {
-        while(true){
-            Log.d("CHARTSCREEN", "Refreshing DATA")
-            currentName?.let { viewModel.getSymbolData(it, 1000) }
-            delay(5000)
-        }
-
-    }*/
 }
 
 @Composable
@@ -145,6 +147,40 @@ fun LightweightChart(
                 //webView.data
                 // Update WebView content when currentChartDatas changes
                 webView.loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar", darkTheme), "text/html", "utf-8", null)
+            })
+    }
+
+
+}
+
+@Composable
+fun IndicatorsChart(
+    name: String?,
+    currentChartDataa: List<CoinAPIResultItem> = emptyList(),
+    viewModel: WhalertViewModel = hiltViewModel(),
+    darkTheme: Boolean = false
+) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                WebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    settings.useWideViewPort = true
+                    settings.loadWithOverviewMode = true
+
+                    addJavascriptInterface(WebAppInterface(context, viewModel), "Android")
+
+                    loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar", darkTheme, name), "text/html", "utf-8", null)
+                }
+            }, update = { webView ->
+                //webView.data
+                // Update WebView content when currentChartDatas changes
+                webView.loadDataWithBaseURL(null, getHtmlContent(currentChartDataa, name, "bar", darkTheme, name), "text/html", "utf-8", null)
             })
     }
 
@@ -204,7 +240,7 @@ fun SearchBar(
     }
 }
 
-fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartType: String, darkTheme: Boolean = false): String {
+fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartType: String, darkTheme: Boolean = false, currentIndicator: String? = null): String {
     var indexOne = 0
     var indexTwo = 0
 
@@ -239,11 +275,16 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
         indexTwo++
     }
 
-    if(chartType == "bar" && !darkTheme){
-        return getBarChartHtmlContent(name, 700)
-    } else if(chartType == "bar" && darkTheme){
-        return getDarkModeBarChartHtmlContent(name, 700)
+    if(currentIndicator == null){
+        if(chartType == "bar" && !darkTheme){
+            return getBarChartHtmlContent(name, 700)
+        } else if(chartType == "bar" && darkTheme){
+            return getDarkModeBarChartHtmlContent(name, 700)
+        }
+    } else {
+        return getPiCycleTopIndicator(700)
     }
+
 
     return getStandardChartContent(name, lineDataScript)
 }
