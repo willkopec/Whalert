@@ -282,7 +282,12 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
             return getDarkModeBarChartHtmlContent(name, 700)
         }
     } else {
-        return getPiCycleTopIndicator(700)
+        when(currentIndicator){
+            "picycle" -> return getPiCycleTopIndicator(700)
+
+            else -> return getPiCycleTopIndicator(700)
+        }
+
     }
 
 

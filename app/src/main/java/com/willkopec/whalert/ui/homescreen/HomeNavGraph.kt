@@ -18,6 +18,7 @@ import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
 import com.willkopec.whalert.ui.favoriteslistscreen.FavoritesListScreen
 import com.willkopec.whalert.util.BottomBarScreen
+import com.willkopec.whalert.util.DashboardNavigation
 
 /*
  * ------------------------------------
@@ -52,7 +53,6 @@ fun HomeNavGraph(
             arguments = listOf(navArgument("indicator") { type = NavType.StringType })
         ) { backStackEntry ->
             val indicator = backStackEntry.arguments?.getString("indicator")
-            Log.d("NAVGRAPH", "GOT HERE ${indicator}")
 
             if (indicator != null) {
                 ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator = indicator)
@@ -61,6 +61,32 @@ fun HomeNavGraph(
         composable(route = BottomBarScreen.DashboardScreen.route) {
             FavoritesListScreen(navController)
         }
+
+        composable(route = DashboardNavigation.DcaSimulator.route) {
+            ScreenContent(name = "TODO:DCA SIMULATOR") {
+
+            }
+        }
+        composable(route = DashboardNavigation.ToolsPage.route) {
+            ScreenContent(name = "TODO:ToolsPage") {
+
+            }
+        }
+        composable(route = DashboardNavigation.SentimentPage.route) {
+            ScreenContent(name = "TODO:SentimentPage") {
+
+            }
+        }
+        composable(route = DashboardNavigation.AnalyticsPage.route) {
+            ScreenContent(name = "TODO:AnalyticsPage") {
+
+            }
+        }
+        /*composable(route = DashboardNavigation.IndicatorsPage.route) {
+            ScreenContent(name = "TODO:INDICATORS LIST") {
+
+            }
+        }*/
 
         detailsNavGraph(navController = navController)
     }

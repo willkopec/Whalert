@@ -34,6 +34,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -290,42 +291,39 @@ fun IndicatorRows(
     navController: NavHostController
 ) {
     Column {
-        Row {
-            for (i in 0 until 5) {
-                Column(modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .clickable {
-                        navController.navigate("${BottomBarScreen.ChartsScreen.route}/picycle") {
-                        popUpTo(navController.graph.findStartDestination().id)
-                        launchSingleTop = true
-                    }
-                        Log.d("NAVIGATION", "${entries[rowIndex].route}")
-                    }) {
-                    if (rowIndex * 5 + i < entries.size) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            entries.subList(rowIndex * 5, minOf((rowIndex + 1) * 5, entries.size)).forEach { entry ->
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .align(Alignment.CenterVertically)
+                        .clickable {
+                            navController.navigate(entry.route) {
+                                popUpTo(navController.graph.findStartDestination().id)
+                                launchSingleTop = true
+                            }
+                            Log.d("NAVIGATION", "${entry.route}")
+                        }
+                ) {
+                    Image(
+                        painter = painterResource(entry.icon),
+                        contentDescription = "Content description for visually impaired",
+                        contentScale = ContentScale.FillWidth,
+                        modifier = Modifier
+                            .size(30.dp)
+                    )
 
-                        Image(
-                            painter = painterResource(entries[rowIndex * 5 + i].icon),
-                            contentDescription = "Content description for visually impaired",
-                            contentScale = ContentScale.FillWidth,
-                            modifier = Modifier
-                                .size(30.dp)
-                        )
-
-                        Text(
-                            text = "${entries[rowIndex * 5 + i].title}",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black
-                        )
-
-
-                    }
+                    Text(
+                        text = entry.title,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp) // Adjust top padding as needed
+                    )
                 }
-                Spacer(modifier = Modifier.width(20.dp))
-
             }
         }
-
         Spacer(modifier = Modifier.height(16.dp))
     }
 }

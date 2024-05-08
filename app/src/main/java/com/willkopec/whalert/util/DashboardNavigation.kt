@@ -14,8 +14,8 @@ sealed class DashboardNavigation(
         icon = R.drawable.baseline_line_axis_24
     )
     object DcaSimulator : DashboardNavigation(
-        title = "DCA Simulator",
-        route = "indicators",
+        title = "DCA Sim",
+        route = "dcasim",
         icon = R.drawable.baseline_price_check_24
     )
     object ToolsPage : DashboardNavigation(

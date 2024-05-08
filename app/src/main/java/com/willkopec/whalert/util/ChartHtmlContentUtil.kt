@@ -414,7 +414,8 @@ chart.subscribeCrosshairMove(param => {
     #chartContainer {
         position: relative;
         width: 100%;
-        height: calc(100vh - 40px); /* Adjusted height to accommodate range-switcher */
+        height: calc(100vh - 60px); /* Adjusted height to accommodate range-switcher */
+        margin-bottom: 60px; /* Equal to the height of the range-switcher */
     }
 
     #additionalContent {
@@ -512,25 +513,46 @@ chart.subscribeCrosshairMove(param => {
     <div id="range-switcher"></div>
 
     <script>
-    // Initialize the chart
-    const chartOptions = {
-        layout: {
-            textColor: 'white',
-            background: { type: 'solid', color: 'black' },
+    function setChartContainerHeight() {
+        const chartContainer = document.getElementById('chartContainer');
+        const buttonsContainerHeight = document.querySelector('.buttons-container').offsetHeight;
+        const additionalContentHeight = document.getElementById('additionalContent').offsetHeight;
+        const rangeSwitcherHeight = document.getElementById('range-switcher').offsetHeight + 35; // Include range switcher height
+        const windowHeight = window.innerHeight;
+
+        // Calculate the remaining height after considering other elements
+        const remainingHeight = windowHeight - buttonsContainerHeight - additionalContentHeight - rangeSwitcherHeight;
+
+        // Set the height of the chart container
+        chartContainer.style.height = remainingHeight + 'px';
+    }
+
+// Initialize the chart with the default height
+setChartContainerHeight();
+
+// Add event listener to recalculate height when the window is resized
+window.addEventListener('resize', setChartContainerHeight);
+
+// Initialize the chart
+const chartOptions = {
+    layout: {
+        textColor: 'white',
+        background: { type: 'solid', color: 'black' },
+    },
+    grid: {
+        vertLines: {
+            color: 'rgba(197, 203, 206, 0.5)',
         },
-        grid: {
-            vertLines: {
-                color: 'rgba(197, 203, 206, 0.5)',
-            },
-            horzLines: {
-                color: 'rgba(197, 203, 206, 0.5)',
-            },
+        horzLines: {
+            color: 'rgba(197, 203, 206, 0.5)',
         },
-        height: 525, // Increased height for better visualization
-    };
-    const container = document.getElementById('chartContainer');
-    const chart = LightweightCharts.createChart(container, chartOptions);
-    let currentInterval = '1DAY'; // Default interval
+    },
+};
+
+// Add the candlestick series to the chart
+const container = document.getElementById('chartContainer');
+const chart = LightweightCharts.createChart(container, chartOptions);
+let currentInterval = '1DAY'; // Default interval
 
     // Add candlestick series to the chart
     const series = chart.addCandlestickSeries({
@@ -757,6 +779,26 @@ chart.subscribeCrosshairMove(param => {
     <div id="range-switcher"></div>
 
     <script>
+    function setChartContainerHeight() {
+            const chartContainer = document.getElementById('chartContainer');
+            const buttonsContainerHeight = document.querySelector('.buttons-container').offsetHeight;
+            const additionalContentHeight = document.getElementById('additionalContent').offsetHeight;
+            const rangeSwitcherHeight = document.getElementById('range-switcher').offsetHeight; // Include range switcher height
+            const windowHeight = window.innerHeight;
+
+            // Calculate the remaining height after considering other elements
+            const remainingHeight = windowHeight - buttonsContainerHeight - additionalContentHeight - rangeSwitcherHeight;
+
+            // Set the height of the chart container
+            chartContainer.style.height = remainingHeight + 'px';
+        }
+
+    // Initialize the chart with the default height
+    setChartContainerHeight();
+
+    // Add event listener to recalculate height when the window is resized
+    window.addEventListener('resize', setChartContainerHeight);
+
     // Initialize the chart
     const chartOptions = {
         layout: {
@@ -771,8 +813,9 @@ chart.subscribeCrosshairMove(param => {
                 color: 'rgba(197, 203, 206, 0.5)',
             },
         },
-        height: 525, // Increased height for better visualization
     };
+
+    // Add the candlestick series to the chart
     const container = document.getElementById('chartContainer');
     const chart = LightweightCharts.createChart(container, chartOptions);
     let currentInterval = '1DAY'; // Default interval

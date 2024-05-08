@@ -169,8 +169,8 @@ fun BottomNavigation(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val bottomBarDestination = screens.any { it.route == currentDestination?.route }
-    if (bottomBarDestination) {
+    //val bottomBarDestination = screens.any { it.route == currentDestination?.route }
+    //if (bottomBarDestination) {
         NavigationBar {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
@@ -207,7 +207,7 @@ fun BottomNavigation(navController: NavHostController) {
                 )
             }
         }
-    }
+    //}
 }
 
 @Composable
