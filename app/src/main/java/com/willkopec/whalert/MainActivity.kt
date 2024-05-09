@@ -25,14 +25,6 @@ import com.willkopec.whalert.ui.theme.WhalertTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-data class BottomNavigationItem(
-    val title: String,
-    val selectedIcon: ImageVector,
-    val unSelectedIcon: ImageVector,
-    val hasNews: Boolean,
-    val badgeCount: Int? = null
-)
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var webView: WebView

@@ -64,12 +64,19 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.willkopec.whalert.BottomNavigationItem
 import com.willkopec.whalert.R
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.ui.theme.WhalertTheme
 import com.willkopec.whalert.util.BottomBarScreen
 import com.willkopec.whalert.util.Constants.Companion.APP_NAME
+
+data class BottomNavigationItem(
+    val title: String,
+    val selectedIcon: ImageVector,
+    val unSelectedIcon: ImageVector,
+    val hasNews: Boolean,
+    val badgeCount: Int? = null
+)
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

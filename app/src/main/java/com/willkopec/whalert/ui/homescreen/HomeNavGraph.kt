@@ -17,6 +17,7 @@ import com.willkopec.whalert.Graph
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
 import com.willkopec.whalert.ui.favoriteslistscreen.FavoritesListScreen
+import com.willkopec.whalert.ui.indicatorslistscreen.IndicatorsListScreenn
 import com.willkopec.whalert.util.BottomBarScreen
 import com.willkopec.whalert.util.DashboardNavigation
 
@@ -62,6 +63,10 @@ fun HomeNavGraph(
             FavoritesListScreen(navController)
         }
 
+        composable(route = DashboardNavigation.IndicatorsPage.route) {
+            IndicatorsListScreenn(navController=navController)
+        }
+
         composable(route = DashboardNavigation.DcaSimulator.route) {
             ScreenContent(name = "TODO:DCA SIMULATOR") {
 
@@ -82,11 +87,6 @@ fun HomeNavGraph(
 
             }
         }
-        /*composable(route = DashboardNavigation.IndicatorsPage.route) {
-            ScreenContent(name = "TODO:INDICATORS LIST") {
-
-            }
-        }*/
 
         detailsNavGraph(navController = navController)
     }

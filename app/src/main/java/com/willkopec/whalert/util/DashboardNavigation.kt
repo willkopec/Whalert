@@ -10,7 +10,7 @@ sealed class DashboardNavigation(
 
     object IndicatorsPage : DashboardNavigation(
         title = "Indicators",
-        route = "${BottomBarScreen.ChartsScreen.route}/picycle",
+        route = "indicators",
         icon = R.drawable.baseline_line_axis_24
     )
     object DcaSimulator : DashboardNavigation(
