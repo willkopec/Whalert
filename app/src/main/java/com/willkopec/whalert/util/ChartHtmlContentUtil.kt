@@ -240,158 +240,265 @@ chart.subscribeCrosshairMove(param => {
         <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
     <title>Real-time Chart Example</title>
     <!-- Include Lightweight Charts library -->
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
     <style>
-			#chartContainer {
-                    position: relative;
-                    width: 100%;
-                    height: 550px;
-                }
+    body {
+        background-color: white;
+        color: white; /* Optionally set text color to white for better visibility */
+    }
+    #chartContainer {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 60px); /* Adjusted height to accommodate range-switcher */
+        margin-bottom: 60px; /* Equal to the height of the range-switcher */
+    }
 
-            #additionalContent {
-                position: absolute;
-                top: 50px;
-                left: 5px;
-                z-index: 20;
-                background-color: #f0f0f0;
-            }
-        /* Add your custom styles here */
-        .buttons-container {
-            display: flex;
-            flex-direction: row;
-            gap: 8px;
-        }
-        .buttons-container button {
-            all: initial;
-            font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 510;
-            line-height: 24px; /* 150% */
-            letter-spacing: -0.32px;
-            padding: 8px 24px;
-            color: rgba(19, 23, 34, 1);
-            background-color: rgba(240, 243, 250, 1);
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .buttons-container button:hover {
-            background-color: rgba(224, 227, 235, 1);
-        }
-        .buttons-container button:active {
-            background-color: rgba(209, 212, 220, 1);
-        }
+    #additionalContent {
+        position: absolute;
+        top: 50px;
+        left: 5px;
+        z-index: 20;
+        background-color: #262522;
+    }
+
+    /* Add your custom styles here */
+    .buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .buttons-container button {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 24px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 24px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .buttons-container button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    .buttons-container button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    #range-switcher {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #FFFFFF;
+        padding: 10px;
+    }
+
+    #range-switcher button {
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 10px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 10px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    #range-switcher button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    #range-switcher button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    .range-switcher-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+    }
     </style>
 </head>
 <body>
     <!-- Container for the chart and buttons -->
     <div id="chartContainer">
-    <!-- Buttons container -->
-    <div class="buttons-container">
-        <!-- Button to scroll to real-time -->
-        <button id="realtimeButton">Go to realtime</button>
-        <!-- Button to add to favorites -->
-        <button id="addToFavoritesButton">Add to Favorites</button>
+        <!-- Buttons container -->
+        <div class="buttons-container">
+            <!-- Button to scroll to real-time -->
+            <button id="realtimeButton">Go to realtime</button>
+            <!-- Button to add to favorites -->
+            <button id="addToFavoritesButton">Add to Favorites</button>
+        </div>
+        <div id="additionalContent">
+            <!-- Price Information: -->
+            <div id="priceInfo"></div>
+        </div>
     </div>
-    <div id="additionalContent">
-        <!-- Price Information: -->
-        <div id="priceInfo"></div>
-    </div>
-</div>
+
+    <!-- Range switcher -->
+    <div id="range-switcher"></div>
 
     <script>
-        // Initialize the chart
-        const chartOptions = {
-            layout: {
-                textColor: 'black',
-                background: { type: 'solid', color: 'white' },
-            },
-            height: 500, // Increased height for better visualization
-        };
-        const container = document.getElementById('chartContainer');
-        const chart = LightweightCharts.createChart(container, chartOptions);
+    function setChartContainerHeight() {
+        const chartContainer = document.getElementById('chartContainer');
+        const buttonsContainerHeight = document.querySelector('.buttons-container').offsetHeight;
+        const additionalContentHeight = document.getElementById('additionalContent').offsetHeight;
+        const rangeSwitcherHeight = document.getElementById('range-switcher').offsetHeight + 35; // Include range switcher height
+        const windowHeight = window.innerHeight;
 
-        // Add candlestick series to the chart
-        const series = chart.addCandlestickSeries({
-            upColor: '#26a69a',
-            downColor: '#ef5350',
-            borderVisible: false,
-            wickUpColor: '#26a69a',
-            wickDownColor: '#ef5350',
-        });
+        // Calculate the remaining height after considering other elements
+        const remainingHeight = windowHeight - buttonsContainerHeight - additionalContentHeight - rangeSwitcherHeight;
 
-        // Function to fetch data from the API endpoint
-        async function fetchDataAndUpdateChart() {
-            try {
-                const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_${symbol?.let {
+        // Set the height of the chart container
+        chartContainer.style.height = remainingHeight + 'px';
+    }
+
+// Initialize the chart with the default height
+setChartContainerHeight();
+
+// Add event listener to recalculate height when the window is resized
+window.addEventListener('resize', setChartContainerHeight);
+
+// Initialize the chart
+const chartOptions = {
+    layout: {
+        textColor: 'black',
+        background: { type: 'solid', color: 'white' },
+    },
+    grid: {
+        vertLines: {
+            color: 'rgba(197, 203, 206, 0.5)',
+        },
+        horzLines: {
+            color: 'rgba(197, 203, 206, 0.5)',
+        },
+    },
+};
+
+// Add the candlestick series to the chart
+const container = document.getElementById('chartContainer');
+const chart = LightweightCharts.createChart(container, chartOptions);
+let currentInterval = '1DAY'; // Default interval
+
+    // Add candlestick series to the chart
+    const series = chart.addCandlestickSeries({
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+    });
+
+    // Function to fetch data from the API endpoint
+    async function fetchDataAndUpdateChart() {
+        try {
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/${symbol?.let {
             convertToCoinAPIFormat(
                 it
             )
-        }}_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data: ' + response.statusText);
-                }
-                const apiData = await response.json();
-                updateChartWithNewData(apiData);
-            } catch (error) {
-                console.error('Error fetching data:', error);
+        }}/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data: ' + response.statusText);
             }
+            const apiData = await response.json();
+            updateChartWithNewData(apiData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
         }
+    }
 
-        // Function to update the chart with new data
-        function updateChartWithNewData(newData) {
-            const candleData = newData.map(item => ({
-                time: item.time_period_start,
-                open: item.price_open,
-                high: item.price_high,
-                low: item.price_low,
-                close: item.price_close,
-            }));
-            series.setData(candleData);
-        }
+    // Function to update the chart with new data
+    function updateChartWithNewData(newData) {
+        const candleData = newData.map(item => ({
+            time: item.time_period_start,
+            open: item.price_open,
+            high: item.price_high,
+            low: item.price_low,
+            close: item.price_close,
+        }));
+        series.setData(candleData);
+    }
 
-        // Function to scroll to real-time data
-        function scrollToRealTime() {
-            chart.timeScale().scrollToRealTime();
-        }
-		
-		function addToOrDeleteFromFavorites() {
-            // Invoke the isInFavorites method of the JavaScript interface
-            if (Android.isInFavorites("$symbol")) {
-                // Symbol is already in favorites, delete it
-                Android.deleteFromFavorites("$symbol");
-            } else {
-                // Symbol is not in favorites, add it
-                Android.addToFavorites("$symbol");
-            }
-        }
+    // Function to scroll to real-time data
+    function scrollToRealTime() {
+        chart.timeScale().scrollToRealTime();
+    }
 
-        // Fetch data from the API and update the chart every 5 seconds
+    function addToOrDeleteFromFavorites() {
+        // Invoke the isInFavorites method of the JavaScript interface
+        if (Android.isInFavorites("$symbol")) {
+            // Symbol is already in favorites, delete it
+            Android.deleteFromFavorites("$symbol");
+        } else {
+            // Symbol is not in favorites, add it
+            Android.addToFavorites("$symbol");
+        }
+    }
+
+    // Fetch data from the API and update the chart every 5 seconds
+    fetchDataAndUpdateChart();
+    setInterval(fetchDataAndUpdateChart, 5000);
+
+    // Add event listener to the real-time button
+    const realtimeButton = document.getElementById('realtimeButton');
+    realtimeButton.addEventListener('click', scrollToRealTime);
+
+    const addToFavoritesButton = document.getElementById('addToFavoritesButton');
+    addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
+
+    chart.subscribeCrosshairMove((param) => {
+        if (param.time) {
+            const data = param.seriesData.get(series);
+            priceInfo.innerHTML =
+                "<div>OPEN: " + data.open + "</div>" +
+                "<div>HIGH: " + data.high + "</div>" +
+                "<div>LOW: " + data.low + "</div>" +
+                "<div>CLOSE: " + data.close + "</div>";
+        }
+    });
+
+    // Function to set the chart interval
+    function setChartInterval(interval) {
+        // Set the current interval
+        if(interval == '1D'){
+            currentInterval = '1DAY';
+        } else if (interval == '1W'){
+            currentInterval = '7DAY';
+        } else if (interval == '1M'){
+            currentInterval = '1MTH';
+        }
+        // Fetch data with the new interval
         fetchDataAndUpdateChart();
-        setInterval(fetchDataAndUpdateChart, 5000);
+        console.log('Chart interval set to: ' + interval);
+    }
 
-        // Add event listener to the real-time button
-        const realtimeButton = document.getElementById('realtimeButton');
-        realtimeButton.addEventListener('click', scrollToRealTime);
-		
-		const addToFavoritesButton = document.getElementById('addToFavoritesButton');
-		addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
-		
-		chart.subscribeCrosshairMove((param) => {
-                    if (param.time) {
-                        const data = param.seriesData.get(series);
-                        priceInfo.innerHTML = 
-                            "<div>OPEN: " + data.open + "</div>" +
-                            "<div>HIGH: " + data.high + "</div>" +
-                            "<div>LOW: " + data.low + "</div>" +
-                            "<div>CLOSE: " + data.close + "</div>";
-                    }
-                });
-		
-    </script>
+    // Array of intervals
+    const intervals = ['1D', '1W', '1M', '1Y'];
+
+    // Get the range-switcher container
+    const rangeSwitcher = document.getElementById('range-switcher');
+
+    // Create buttons for each interval and append them to the range-switcher container
+    intervals.forEach(interval => {
+        const button = document.createElement('button');
+        button.innerText = interval;
+        button.addEventListener('click', () => setChartInterval(interval));
+        rangeSwitcher.appendChild(button);
+    });
+
+</script>
 </body>
 </html>
     """.trimIndent()
@@ -666,7 +773,7 @@ let currentInterval = '1DAY'; // Default interval
     """.trimIndent()
     }
 
-    fun getPiCycleTopIndicator(days: Int): String{
+    fun getPiCycleTopIndicator(days: Int): String {
         return """
         <html>
 <head>
@@ -933,6 +1040,478 @@ function updateChartWithNewData(newData) {
     });
 
     </script>
+</body>
+</html>
+    """.trimIndent()
+    }
+
+    fun getBtcProfitableDaysIndicatorLightMode(symbol: String = ""): String{
+        return """
+        <html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <title>Real-time Chart Example</title>
+    <!-- Include Lightweight Charts library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+    body {
+        background-color: white;
+        color: white; /* Optionally set text color to white for better visibility */
+    }
+    #chartContainer {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 60px); /* Adjusted height to accommodate range-switcher */
+        margin-bottom: 60px; /* Equal to the height of the range-switcher */
+    }
+
+    #additionalContent {
+        position: absolute;
+        top: 50px;
+        left: 5px;
+        z-index: 20;
+        background-color: #262522;
+    }
+
+    /* Add your custom styles here */
+    .buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .buttons-container button {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 24px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 24px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .buttons-container button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    .buttons-container button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    #range-switcher {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #FFFFFF;
+        padding: 10px;
+    }
+
+    #range-switcher button {
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 10px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 10px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    #range-switcher button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    #range-switcher button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    .range-switcher-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+    }
+
+    #winLossRatio {
+    display: block; /* Ensure the element is displayed */
+    color: black; /* Set text color */
+}
+    </style>
+</head>
+<body>
+    <!-- Container for the chart and buttons -->
+    <div id="chartContainer">
+        <!-- Buttons container -->
+        <div class="buttons-container">
+            <!-- Button to scroll to real-time -->
+            <button id="realtimeButton">Go to realtime</button>
+            <!-- Button to add to favorites -->
+            <button id="addToFavoritesButton">Add to Favorites</button>
+            <!-- Display win/loss ratio -->
+            <div id="winLossRatio"></div>
+        </div>
+        <div id="additionalContent">
+            <!-- Price Information: -->
+            <div id="priceInfo"></div>
+        </div>
+    </div>
+
+    <!-- Range switcher -->
+    <div id="range-switcher"></div>
+
+    <script>
+    let loseCount = 0;
+    let winCount = 0;
+    let ratioCalculated = false;
+
+    function setChartContainerHeight() {
+        const chartContainer = document.getElementById('chartContainer');
+        const buttonsContainerHeight = document.querySelector('.buttons-container').offsetHeight;
+        const additionalContentHeight = document.getElementById('additionalContent').offsetHeight;
+        const rangeSwitcherHeight = document.getElementById('range-switcher').offsetHeight; // Include range switcher height
+        const windowHeight = window.innerHeight;
+
+        // Calculate the remaining height after considering other elements
+        const remainingHeight = windowHeight - buttonsContainerHeight - additionalContentHeight - rangeSwitcherHeight;
+
+        // Set the height of the chart container
+        chartContainer.style.height = remainingHeight + 'px';
+    }
+
+    // Initialize the chart with the default height
+    setChartContainerHeight();
+
+    // Add event listener to recalculate height when the window is resized
+    window.addEventListener('resize', setChartContainerHeight);
+
+    // Initialize the chart
+    const chartOptions = {
+        layout: {
+            textColor: 'black',
+            background: { type: 'solid', color: 'white' },
+        },
+        grid: {
+            vertLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+            horzLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+        },
+    };
+
+    // Add the line series to the chart
+    const container = document.getElementById('chartContainer');
+    const chart = LightweightCharts.createChart(container, chartOptions);
+    let currentInterval = '1DAY'; // Default interval
+
+    // Add line series to the chart
+    const series = chart.addLineSeries({
+        color: '#26a69a',
+        lineWidth: 2,
+    });
+
+    // Function to fetch data from the API endpoint
+    async function fetchDataAndUpdateChart() {
+        try {
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data: ' + response.statusText);
+            }
+            const apiData = await response.json();
+            updateChartWithNewData(apiData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Function to update the chart with new data
+    function updateChartWithNewData(newData) {
+        const previousClosePrice = newData[newData.length - 2].price_close;
+        
+        const lineData = newData.map(item => {
+            const isWin = item.price_close > previousClosePrice;
+            if (isWin) {
+                winCount++;
+            } else {
+                loseCount++;
+            }
+            return {
+                time: item.time_period_start,
+                value: item.price_close,
+                color: isWin ? 'red' : 'green' // Set color based on value compared to threshold
+            };
+        });
+
+        // Display win/loss ratio
+        // Display win/loss ratio
+const winLossRatioElement = document.getElementById('winLossRatio');
+if (!ratioCalculated && winCount + loseCount > 0) {
+    const ratio = loseCount / (winCount + loseCount);
+    winLossRatioElement.innerHTML = `% Days Profitable: ${'$'}{ratio.toFixed(2)} %<br>`;
+    winLossRatioElement.innerHTML += `Profitable Days: ${'$'}{loseCount}<br>`;
+    winLossRatioElement.innerHTML += `Unprofitable Days: ${'$'}{winCount}<br>`;
+    ratioCalculated = true; // Set flag to true
+} else if (!ratioCalculated && winCount + loseCount == 0) {
+    winLossRatioElement.innerText = '';
+}
+        series.setData(lineData);
+    }
+
+    // Function to scroll to real-time data
+    function scrollToRealTime() {
+        chart.timeScale().scrollToRealTime();
+    }
+
+    function addToOrDeleteFromFavorites() {
+        // Invoke the isInFavorites method of the JavaScript interface
+        if (Android.isInFavorites("$symbol")) {
+            // Symbol is already in favorites, delete it
+            Android.deleteFromFavorites("$symbol");
+        } else {
+            // Symbol is not in favorites, add it
+            Android.addToFavorites("$symbol");
+        }
+    }
+
+    // Fetch data from the API and update the chart every 5 seconds
+    fetchDataAndUpdateChart();
+    setInterval(fetchDataAndUpdateChart, 5000);
+
+    // Add event listener to the real-time button
+    const realtimeButton = document.getElementById('realtimeButton');
+    realtimeButton.addEventListener('click', scrollToRealTime);
+
+    const addToFavoritesButton = document.getElementById('addToFavoritesButton');
+    addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
+
+</script>
+</body>
+</html>
+    """.trimIndent()
+    }
+
+    fun getBtcProfitableDaysIndicatorDarkMode(symbol: String = ""): String {
+        return """
+        <html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <title>Real-time Chart Example</title>
+    <!-- Include Lightweight Charts library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+    body {
+        background-color: black;
+        color: black; /* Optionally set text color to white for better visibility */
+    }
+    #chartContainer {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 60px); /* Adjusted height to accommodate range-switcher */
+        margin-bottom: 60px; /* Equal to the height of the range-switcher */
+    }
+
+    #additionalContent {
+        position: absolute;
+        top: 50px;
+        left: 5px;
+        z-index: 20;
+        background-color: #262522;
+    }
+
+    /* Add your custom styles here */
+    .buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .buttons-container button {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 24px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 24px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .buttons-container button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    .buttons-container button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    #winLossRatio {
+    display: block; /* Ensure the element is displayed */
+    color: white; /* Set text color */
+}
+    </style>
+</head>
+<body>
+    <!-- Container for the chart and buttons -->
+    <div id="chartContainer">
+        <!-- Buttons container -->
+        <div class="buttons-container">
+            <!-- Button to scroll to real-time -->
+            <button id="realtimeButton">Go to realtime</button>
+            <!-- Button to add to favorites -->
+            <button id="addToFavoritesButton">Add to Favorites</button>
+            <!-- Display win/loss ratio -->
+            <div id="winLossRatio"></div>
+        </div>
+        <div id="additionalContent">
+            <!-- Price Information: -->
+            <div id="priceInfo"></div>
+        </div>
+    </div>
+
+    <!-- Range switcher -->
+    <div id="range-switcher"></div>
+
+    <script>
+    let loseCount = 0;
+    let winCount = 0;
+    let ratioCalculated = false;
+
+    function setChartContainerHeight() {
+        const chartContainer = document.getElementById('chartContainer');
+        const buttonsContainerHeight = document.querySelector('.buttons-container').offsetHeight;
+        const additionalContentHeight = document.getElementById('additionalContent').offsetHeight;
+        const rangeSwitcherHeight = document.getElementById('range-switcher').offsetHeight + 35; // Include range switcher height
+        const windowHeight = window.innerHeight;
+
+        // Calculate the remaining height after considering other elements
+        const remainingHeight = windowHeight - buttonsContainerHeight - additionalContentHeight - rangeSwitcherHeight;
+
+        // Set the height of the chart container
+        chartContainer.style.height = remainingHeight + 'px';
+    }
+
+    // Initialize the chart with the default height
+    setChartContainerHeight();
+
+    // Add event listener to recalculate height when the window is resized
+    window.addEventListener('resize', setChartContainerHeight);
+
+    // Initialize the chart
+    const chartOptions = {
+        layout: {
+            textColor: 'white',
+            background: { type: 'solid', color: 'black' },
+        },
+        grid: {
+            vertLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+            horzLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+        },
+    };
+
+    // Add the line series to the chart
+    const container = document.getElementById('chartContainer');
+    const chart = LightweightCharts.createChart(container, chartOptions);
+    let currentInterval = '1DAY'; // Default interval
+
+    // Add line series to the chart
+    const series = chart.addLineSeries({
+        color: '#26a69a',
+        lineWidth: 2,
+    });
+
+    // Function to fetch data from the API endpoint
+    async function fetchDataAndUpdateChart() {
+        try {
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data: ' + response.statusText);
+            }
+            const apiData = await response.json();
+            updateChartWithNewData(apiData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Function to update the chart with new data
+    function updateChartWithNewData(newData) {
+        const previousClosePrice = newData[newData.length - 2].price_close;
+        
+        const lineData = newData.map(item => {
+            const isWin = item.price_close > previousClosePrice;
+            if (isWin) {
+                winCount++;
+            } else {
+                loseCount++;
+            }
+            return {
+                time: item.time_period_start,
+                value: item.price_close,
+                color: isWin ? 'red' : 'green' // Set color based on value compared to threshold
+            };
+        });
+
+        // Display win/loss ratio
+        // Display win/loss ratio
+const winLossRatioElement = document.getElementById('winLossRatio');
+if (!ratioCalculated && winCount + loseCount > 0) {
+    const ratio = loseCount / (winCount + loseCount);
+    winLossRatioElement.innerHTML = `% Days Profitable: ${'$'}{ratio.toFixed(2)} %<br>`;
+    winLossRatioElement.innerHTML += `Profitable Days: ${'$'}{loseCount}<br>`;
+    winLossRatioElement.innerHTML += `Unprofitable Days: ${'$'}{winCount}<br>`;
+    ratioCalculated = true; // Set flag to true
+} else if (!ratioCalculated && winCount + loseCount == 0) {
+    winLossRatioElement.innerText = '';
+}
+        series.setData(lineData);
+    }
+
+    // Function to scroll to real-time data
+    function scrollToRealTime() {
+        chart.timeScale().scrollToRealTime();
+    }
+
+    function addToOrDeleteFromFavorites() {
+        // Invoke the isInFavorites method of the JavaScript interface
+        if (Android.isInFavorites("$symbol")) {
+            // Symbol is already in favorites, delete it
+            Android.deleteFromFavorites("$symbol");
+        } else {
+            // Symbol is not in favorites, add it
+            Android.addToFavorites("$symbol");
+        }
+    }
+
+    // Fetch data from the API and update the chart every 5 seconds
+    fetchDataAndUpdateChart();
+    setInterval(fetchDataAndUpdateChart, 5000);
+
+    // Add event listener to the real-time button
+    const realtimeButton = document.getElementById('realtimeButton');
+    realtimeButton.addEventListener('click', scrollToRealTime);
+
+    const addToFavoritesButton = document.getElementById('addToFavoritesButton');
+    addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
+
+</script>
 </body>
 </html>
     """.trimIndent()

@@ -65,6 +65,8 @@ import com.willkopec.whalert.*
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChartHtmlContent
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorDarkMode
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicator
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
@@ -282,11 +284,20 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
             return getDarkModeBarChartHtmlContent(name, 700)
         }
     } else {
-        when(currentIndicator){
-            "picycle" -> return getPiCycleTopIndicator(700)
-
-            else -> return getPiCycleTopIndicator(700)
+        if(darkTheme){
+            when(currentIndicator){
+                "picycle" -> return getPiCycleTopIndicator(700)
+                "profitable_days" -> return getBtcProfitableDaysIndicatorDarkMode()
+                else -> return getPiCycleTopIndicator(700)
+            }
+        } else {
+            when(currentIndicator){
+                "picycle" -> return getPiCycleTopIndicator(700)
+                "profitable_days" -> return getBtcProfitableDaysIndicatorLightMode()
+                else -> return getPiCycleTopIndicator(700)
+            }
         }
+
 
     }
 

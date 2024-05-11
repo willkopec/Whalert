@@ -59,6 +59,12 @@ data class IndicatorListItemInfo(
                     description = "This indicator uses two moving averages to predict the top of the current crypto cycle. When the indicator's yellow moving average crosses the blue moving average, this should predict the current cycle top within 3 days of the moving averages crossing.",
                     indicatorID = "picycle",
                     chartImage = ""
+                ),
+                IndicatorListItemInfo(
+                    name = "BTC Profitable Days",
+                    description = "This indicator takes the current price of Bitcoin and calculates the amount of profitable buy days if you were to sell today at the current price.",
+                    indicatorID = "profitable_days",
+                    chartImage = ""
                 )
             )
 
@@ -103,7 +109,7 @@ data class IndicatorListItemInfo(
                 .fillMaxWidth()
                 .shadow(1.dp, RoundedCornerShape(1.dp))
                 .clickable {
-                    navController.navigate("profile/picycle") {
+                    navController.navigate("${BottomBarScreen.ChartsScreen.route}/${indicatorData.indicatorID}") {
                         popUpTo(navController.graph.findStartDestination().id)
                         launchSingleTop = true
                     }
