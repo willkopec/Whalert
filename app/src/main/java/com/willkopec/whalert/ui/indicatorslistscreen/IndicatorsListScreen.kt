@@ -65,6 +65,12 @@ data class IndicatorListItemInfo(
                     description = "This indicator takes the current price of Bitcoin and calculates the amount of profitable buy days if you were to sell today at the current price.",
                     indicatorID = "profitable_days",
                     chartImage = ""
+                ),
+                IndicatorListItemInfo(
+                    name = "2 Year MA Multiplier",
+                    description = "This indicator uses the 2 year moving average and 5x the 2 year moving average to give good a good range of where the bitcoin price should be and any values outside of these moving averages should indicate under or over valued prices.",
+                    indicatorID = "2y_ma_multiplier",
+                    chartImage = ""
                 )
             )
 

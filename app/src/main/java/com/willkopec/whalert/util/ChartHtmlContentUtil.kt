@@ -1256,7 +1256,7 @@ function updateChartWithNewData(newData) {
 const winLossRatioElement = document.getElementById('winLossRatio');
 if (!ratioCalculated && winCount + loseCount > 0) {
     const ratio = loseCount / (winCount + loseCount);
-    winLossRatioElement.innerHTML = `% Days Profitable: ${'$'}{ratio.toFixed(2)} %<br>`;
+    winLossRatioElement.innerHTML = `% Days Profitable: ${'$'}{ratio.toFixed(2) * 100} %<br>`;
     winLossRatioElement.innerHTML += `Profitable Days: ${'$'}{loseCount}<br>`;
     winLossRatioElement.innerHTML += `Unprofitable Days: ${'$'}{winCount}<br>`;
     ratioCalculated = true; // Set flag to true
@@ -1474,7 +1474,7 @@ if (!ratioCalculated && winCount + loseCount > 0) {
 const winLossRatioElement = document.getElementById('winLossRatio');
 if (!ratioCalculated && winCount + loseCount > 0) {
     const ratio = loseCount / (winCount + loseCount);
-    winLossRatioElement.innerHTML = `% Days Profitable: ${'$'}{ratio.toFixed(2)} %<br>`;
+    winLossRatioElement.innerHTML = `% Days Profitable: ${'$'}{ratio.toFixed(2) * 100} %<br>`;
     winLossRatioElement.innerHTML += `Profitable Days: ${'$'}{loseCount}<br>`;
     winLossRatioElement.innerHTML += `Unprofitable Days: ${'$'}{winCount}<br>`;
     ratioCalculated = true; // Set flag to true
@@ -1512,6 +1512,596 @@ if (!ratioCalculated && winCount + loseCount > 0) {
     addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
 
 </script>
+</body>
+</html>
+    """.trimIndent()
+    }
+
+    fun getTwoYearMAMultiplierIndicatorLightMode(symbol: String = ""): String {
+        return """
+        <html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <title>Real-time Chart Example</title>
+    <!-- Include Lightweight Charts library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+    body {
+        background-color: white;
+        color: white; /* Optionally set text color to white for better visibility */
+    }
+    #chartContainer {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 40px); /* Adjusted height to accommodate range-switcher */
+    }
+
+    #additionalContent {
+        position: absolute;
+        top: 50px;
+        left: 5px;
+        z-index: 20;
+        background-color: #262522;
+    }
+
+    /* Add your custom styles here */
+    .buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .buttons-container button {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 24px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 24px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .buttons-container button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    .buttons-container button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    #range-switcher {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #FFFFFF;
+        padding: 10px;
+    }
+
+    #range-switcher button {
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 10px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 10px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    #range-switcher button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    #range-switcher button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    .range-switcher-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+    }
+    </style>
+</head>
+<body>
+    <!-- Container for the chart and buttons -->
+    <div id="chartContainer">
+        <!-- Buttons container -->
+        <div class="buttons-container">
+            <!-- Button to scroll to real-time -->
+            <button id="realtimeButton">Go to realtime</button>
+        </div>
+        <div id="additionalContent">
+            <!-- Price Information: -->
+            <div id="priceInfo"></div>
+        </div>
+    </div>
+
+    <!-- Range switcher -->
+    <div id="range-switcher"></div>
+
+    <script>
+    function setChartContainerHeight() {
+            const chartContainer = document.getElementById('chartContainer');
+            const buttonsContainerHeight = document.querySelector('.buttons-container').offsetHeight;
+            const additionalContentHeight = document.getElementById('additionalContent').offsetHeight;
+            const rangeSwitcherHeight = document.getElementById('range-switcher').offsetHeight; // Include range switcher height
+            const windowHeight = window.innerHeight;
+
+            // Calculate the remaining height after considering other elements
+            const remainingHeight = windowHeight - buttonsContainerHeight - additionalContentHeight - rangeSwitcherHeight;
+
+            // Set the height of the chart container
+            chartContainer.style.height = remainingHeight + 'px';
+        }
+
+    // Initialize the chart with the default height
+    setChartContainerHeight();
+
+    // Add event listener to recalculate height when the window is resized
+    window.addEventListener('resize', setChartContainerHeight);
+
+    // Initialize the chart
+    const chartOptions = {
+        layout: {
+            textColor: 'black',
+            background: { type: 'solid', color: 'white' },
+        },
+        grid: {
+            vertLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+            horzLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+        },
+    };
+
+    // Add the candlestick series to the chart
+    const container = document.getElementById('chartContainer');
+    const chart = LightweightCharts.createChart(container, chartOptions);
+    let currentInterval = '1DAY'; // Default interval
+
+    // Add line series to the chart
+const series = chart.addLineSeries();
+
+    let previousFillSeries; // Variable to store previous fill series
+
+    // Function to fetch data from the API endpoint
+    async function fetchDataAndUpdateChart() {
+        try {
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data: ' + response.statusText);
+            }
+            const apiData = await response.json();
+            updateChartWithNewData(apiData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Add SMA trend lines to the chart
+    const smaPeriod = 730;
+    const smaSeries = chart.addLineSeries({
+        color: 'rgba(60, 179, 113, 1)',
+        lineWidth: 2,
+    });
+    const smaPeriod2 = 730;
+    const smaSeries2 = chart.addLineSeries({
+        color: 'rgba(255, 0, 0, 1)',
+        lineWidth: 2,
+    });
+
+    // Function to shade the area below SMA
+    function shadeAreaBelowSMA(currentPrice, smaData, series) {
+        const priceBelowSMAData = smaData.filter(point => point.value > currentPrice);
+        const firstPoint = { time: priceBelowSMAData[0].time, value: currentPrice };
+        const dataToFill = [firstPoint, ...priceBelowSMAData];
+        const fillSeries = chart.addAreaSeries({
+            topColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            bottomColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineWidth: 0, // No line width for the fill series
+        });
+        fillSeries.setData(dataToFill);
+        return fillSeries;
+    }
+
+    function updateChartWithNewData(newData) {
+    const lineData = newData.map(item => ({
+        time: item.time_period_start,
+        value: item.price_close,
+    }));
+    series.setData(lineData);
+
+    // Calculate SMA
+    const smaData = calculateSMA(lineData, smaPeriod);
+    smaSeries.setData(smaData);
+
+    const smaData2 = calculateSMATimesFive(lineData, smaPeriod2);
+    smaSeries2.setData(smaData2);
+
+    // Remove previous fill series if exists
+    if (previousFillSeries) {
+        chart.removeSeries(previousFillSeries);
+    }
+
+    // Shade the area below SMA when lineData goes under SMA
+    const dataToFill = [];
+    for (let i = 0; i < lineData.length; i++) {
+        if (lineData[i].value < smaData[i].value) {
+            dataToFill.push({
+                time: lineData[i].time,
+                value: lineData[i].value,
+            });
+        }
+    }
+    if (dataToFill.length > 0) {
+        dataToFill.unshift({
+            time: dataToFill[0].time,
+            value: smaData[0].value,
+        });
+        previousFillSeries = chart.addAreaSeries({
+            topColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            bottomColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineWidth: 0, // No line width for the fill series
+        });
+        previousFillSeries.setData(dataToFill);
+    }
+}
+
+    // Function to calculate Simple Moving Average (SMA)
+    function calculateSMA(data, period) {
+        const sma = [];
+        for (let i = period - 1; i < data.length; i++) {
+            let sum = 0;
+            for (let j = i - period + 1; j <= i; j++) {
+                sum += data[j].value;
+            }
+            sma.push({
+                time: data[i].time,
+                value: sum / period,
+            });
+        }
+        return sma;
+    }
+
+    // Function to calculate Simple Moving Average (SMA) multiplied by 5
+    function calculateSMATimesFive(data, period) {
+        const sma = [];
+        for (let i = period - 1; i < data.length; i++) {
+            let sum = 0;
+            for (let j = i - period + 1; j <= i; j++) {
+                sum += data[j].value;
+            }
+            sma.push({
+                time: data[i].time,
+                value: (sum / period) * 5,
+            });
+        }
+        return sma;
+    }
+
+    // Function to scroll to real-time data
+    function scrollToRealTime() {
+        chart.timeScale().scrollToRealTime();
+    }
+
+    // Fetch data from the API and update the chart every 5 seconds
+    fetchDataAndUpdateChart();
+    setInterval(fetchDataAndUpdateChart, 5000);
+
+    // Add event listener to the real-time button
+    const realtimeButton = document.getElementById('realtimeButton');
+    realtimeButton.addEventListener('click', scrollToRealTime);
+
+    </script>
+</body>
+</html>
+    """.trimIndent()
+    }
+
+    fun getTwoYearMAMultiplierIndicatorDarkMode(symbol: String = ""): String {
+        return """
+        <html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+    <title>Real-time Chart Example</title>
+    <!-- Include Lightweight Charts library -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+    body {
+        background-color: black;
+        color: black; /* Optionally set text color to white for better visibility */
+    }
+    #chartContainer {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 40px); /* Adjusted height to accommodate range-switcher */
+    }
+
+    #additionalContent {
+        position: absolute;
+        top: 50px;
+        left: 5px;
+        z-index: 20;
+        background-color: #262522;
+    }
+
+    /* Add your custom styles here */
+    .buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .buttons-container button {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 24px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 24px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .buttons-container button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    .buttons-container button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    #range-switcher {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #000000;
+        padding: 10px;
+    }
+
+    #range-switcher button {
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 10px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 10px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    #range-switcher button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    #range-switcher button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    .range-switcher-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+    }
+    </style>
+</head>
+<body>
+    <!-- Container for the chart and buttons -->
+    <div id="chartContainer">
+        <!-- Buttons container -->
+        <div class="buttons-container">
+            <!-- Button to scroll to real-time -->
+            <button id="realtimeButton">Go to realtime</button>
+        </div>
+        <div id="additionalContent">
+            <!-- Price Information: -->
+            <div id="priceInfo"></div>
+        </div>
+    </div>
+
+    <!-- Range switcher -->
+    <div id="range-switcher"></div>
+
+    <script>
+    function setChartContainerHeight() {
+            const chartContainer = document.getElementById('chartContainer');
+            const buttonsContainerHeight = document.querySelector('.buttons-container').offsetHeight;
+            const additionalContentHeight = document.getElementById('additionalContent').offsetHeight;
+            const rangeSwitcherHeight = document.getElementById('range-switcher').offsetHeight; // Include range switcher height
+            const windowHeight = window.innerHeight;
+
+            // Calculate the remaining height after considering other elements
+            const remainingHeight = windowHeight - buttonsContainerHeight - additionalContentHeight - rangeSwitcherHeight;
+
+            // Set the height of the chart container
+            chartContainer.style.height = remainingHeight + 'px';
+        }
+
+    // Initialize the chart with the default height
+    setChartContainerHeight();
+
+    // Add event listener to recalculate height when the window is resized
+    window.addEventListener('resize', setChartContainerHeight);
+
+    // Initialize the chart
+    const chartOptions = {
+        layout: {
+            textColor: 'white',
+            background: { type: 'solid', color: 'black' },
+        },
+        grid: {
+            vertLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+            horzLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+        },
+    };
+
+    // Add the candlestick series to the chart
+    const container = document.getElementById('chartContainer');
+    const chart = LightweightCharts.createChart(container, chartOptions);
+    let currentInterval = '1DAY'; // Default interval
+
+    // Add line series to the chart
+const series = chart.addLineSeries();
+
+    let previousFillSeries; // Variable to store previous fill series
+
+    // Function to fetch data from the API endpoint
+    async function fetchDataAndUpdateChart() {
+        try {
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data: ' + response.statusText);
+            }
+            const apiData = await response.json();
+            updateChartWithNewData(apiData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+    // Add SMA trend lines to the chart
+    const smaPeriod = 730;
+    const smaSeries = chart.addLineSeries({
+        color: 'rgba(60, 179, 113, 1)',
+        lineWidth: 2,
+    });
+    const smaPeriod2 = 730;
+    const smaSeries2 = chart.addLineSeries({
+        color: 'rgba(255, 0, 0, 1)',
+        lineWidth: 2,
+    });
+
+    // Function to shade the area below SMA
+    function shadeAreaBelowSMA(currentPrice, smaData, series) {
+        const priceBelowSMAData = smaData.filter(point => point.value > currentPrice);
+        const firstPoint = { time: priceBelowSMAData[0].time, value: currentPrice };
+        const dataToFill = [firstPoint, ...priceBelowSMAData];
+        const fillSeries = chart.addAreaSeries({
+            topColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            bottomColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineWidth: 0, // No line width for the fill series
+        });
+        fillSeries.setData(dataToFill);
+        return fillSeries;
+    }
+
+    function updateChartWithNewData(newData) {
+    const lineData = newData.map(item => ({
+        time: item.time_period_start,
+        value: item.price_close,
+    }));
+    series.setData(lineData);
+
+    // Calculate SMA
+    const smaData = calculateSMA(lineData, smaPeriod);
+    smaSeries.setData(smaData);
+
+    const smaData2 = calculateSMATimesFive(lineData, smaPeriod2);
+    smaSeries2.setData(smaData2);
+
+    // Remove previous fill series if exists
+    if (previousFillSeries) {
+        chart.removeSeries(previousFillSeries);
+    }
+
+    // Shade the area below SMA when lineData goes under SMA
+    const dataToFill = [];
+    for (let i = 0; i < lineData.length; i++) {
+        if (lineData[i].value < smaData[i].value) {
+            dataToFill.push({
+                time: lineData[i].time,
+                value: lineData[i].value,
+            });
+        }
+    }
+    if (dataToFill.length > 0) {
+        dataToFill.unshift({
+            time: dataToFill[0].time,
+            value: smaData[0].value,
+        });
+        previousFillSeries = chart.addAreaSeries({
+            topColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            bottomColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineColor: 'rgba(0, 255, 0, 0.5)', // Bright green color for shading
+            lineWidth: 0, // No line width for the fill series
+        });
+        previousFillSeries.setData(dataToFill);
+    }
+}
+
+    // Function to calculate Simple Moving Average (SMA)
+    function calculateSMA(data, period) {
+        const sma = [];
+        for (let i = period - 1; i < data.length; i++) {
+            let sum = 0;
+            for (let j = i - period + 1; j <= i; j++) {
+                sum += data[j].value;
+            }
+            sma.push({
+                time: data[i].time,
+                value: sum / period,
+            });
+        }
+        return sma;
+    }
+
+    // Function to calculate Simple Moving Average (SMA) multiplied by 5
+    function calculateSMATimesFive(data, period) {
+        const sma = [];
+        for (let i = period - 1; i < data.length; i++) {
+            let sum = 0;
+            for (let j = i - period + 1; j <= i; j++) {
+                sum += data[j].value;
+            }
+            sma.push({
+                time: data[i].time,
+                value: (sum / period) * 5,
+            });
+        }
+        return sma;
+    }
+
+    // Function to scroll to real-time data
+    function scrollToRealTime() {
+        chart.timeScale().scrollToRealTime();
+    }
+
+    // Fetch data from the API and update the chart every 5 seconds
+    fetchDataAndUpdateChart();
+    setInterval(fetchDataAndUpdateChart, 5000);
+
+    // Add event listener to the real-time button
+    const realtimeButton = document.getElementById('realtimeButton');
+    realtimeButton.addEventListener('click', scrollToRealTime);
+
+    </script>
 </body>
 </html>
     """.trimIndent()

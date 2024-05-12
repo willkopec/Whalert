@@ -70,6 +70,8 @@ import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndic
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicator
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getTwoYearMAMultiplierIndicatorDarkMode
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getTwoYearMAMultiplierIndicatorLightMode
 import com.willkopec.whalert.util.DateUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -288,12 +290,14 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
             when(currentIndicator){
                 "picycle" -> return getPiCycleTopIndicator(700)
                 "profitable_days" -> return getBtcProfitableDaysIndicatorDarkMode()
+                "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorDarkMode()
                 else -> return getPiCycleTopIndicator(700)
             }
         } else {
             when(currentIndicator){
                 "picycle" -> return getPiCycleTopIndicator(700)
                 "profitable_days" -> return getBtcProfitableDaysIndicatorLightMode()
+                "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorLightMode()
                 else -> return getPiCycleTopIndicator(700)
             }
         }
