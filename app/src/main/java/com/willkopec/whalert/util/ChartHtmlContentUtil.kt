@@ -2106,5 +2106,379 @@ const series = chart.addLineSeries();
 </html>
     """.trimIndent()
     }
+
+    fun getDcaSimulatorLightMode(symbol: String = ""): String {
+        return """
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+<title>Date Picker Example</title>
+<!-- Include CSS for datepicker -->
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<style>
+    body {
+        background-color: white;
+        color: black; /* Optionally set text color to white for better visibility */
+    }
+    #chartContainer {
+        position: relative;
+        width: 100%;
+        height: calc(100vh - 40px); /* Adjusted height to accommodate range-switcher */
+    }
+
+    #additionalContent {
+        position: absolute;
+        top: 50px;
+        left: 5px;
+        z-index: 20;
+        background-color: #262522;
+    }
+
+    /* Add your custom styles here */
+    .buttons-container {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .buttons-container button {
+        all: initial;
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 24px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 24px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .buttons-container button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    .buttons-container button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    #range-switcher {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #FFFFFF;
+        padding: 10px;
+    }
+
+    #range-switcher button {
+        font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 510;
+        line-height: 10px; /* 150% */
+        letter-spacing: -0.32px;
+        padding: 8px 10px;
+        color: rgba(19, 23, 34, 1);
+        background-color: rgba(240, 243, 250, 1);
+        border-radius: 8px;
+        cursor: pointer;
+    }
+    #range-switcher button:hover {
+        background-color: rgba(224, 227, 235, 1);
+    }
+
+    #range-switcher button:active {
+        background-color: rgba(209, 212, 220, 1);
+    }
+
+    .range-switcher-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+    }
+    .container {
+        text-align: center;
+    }
+    .datepicker {
+        display: inline-block;
+        margin-right: 20px;
+    }
+    h2 {
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Date Picker 1 -->
+    <div class="datepicker">
+        <label for="datepicker1">Select DCA Start Date:</label>
+        <input type="text" id="datepicker1" placeholder="YYYY-MM-DD">
+    </div>
+
+    <!-- Date Picker 2 -->
+    <div class="datepicker">
+        <label for="datepicker2">Select DCA End Date:</label>
+        <input type="text" id="datepicker2" placeholder="YYYY-MM-DD">
+    </div>
+
+    <!-- Input box for accepting a number -->
+    <div>
+        <label for="numberInput">Enter DCA Amount:</label>
+        <input type="number" id="numberInput" name="numberInput" placeholder="Enter DCA Amount">
+    </div>
+
+    <!-- Dropdown for selecting frequency -->
+    <div>
+        <label for="frequencySelect">Select Frequency:</label>
+        <select id="frequencySelect">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+        </select>
+    </div>
+
+    <!-- Button to execute processValues function -->
+    <button onclick="processValues()">Simulate DCA</button>
+
+    <!-- Container for displaying total DCA amount -->
+    <div id="totalDcaContainer"></div>
+</div>
+
+<div id="chartContainer">
+    <!-- Buttons container -->
+    <div class="buttons-container">
+        <!-- Button to scroll to real-time -->
+        <button id="realtimeButton">Go to realtime</button>
+    </div>
+    <div id="additionalContent">
+        <!-- Price Information: -->
+        <div id="priceInfo"></div>
+    </div>
+</div>
+
+<!-- Range switcher -->
+<div id="range-switcher"></div>
+
+<!-- Include Lightweight Charts library -->
+<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Include jQuery UI -->
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    let startDate;
+    let endDate;
+    let dcaAmount = getDefaultDcaAmount();
+    let frequency = getDefaultFrequency();
+
+    function setChartContainerHeight() {
+    const chartContainer = document.getElementById('chartContainer');
+    const totalDcaContainer = document.getElementById('totalDcaContainer');
+    const windowHeight = window.innerHeight;
+    const elementsAboveChart = document.querySelectorAll('.buttons-container, #additionalContent, #range-switcher, .container');
+    let totalHeightAboveChart = 0;
+
+    // Calculate the total height of all elements above the chart container
+    elementsAboveChart.forEach(element => {
+        totalHeightAboveChart += element.offsetHeight;
+    });
+
+    // Calculate the total height of the chart container including the totalDcaContainer
+    const totalChartContainerHeight = totalHeightAboveChart + totalDcaContainer.offsetHeight;
+
+    // Set the height of the chart container
+    chartContainer.style.height = (windowHeight - totalChartContainerHeight) + 'px';
+}
+
+
+
+    // Initialize the chart with the default height
+    setChartContainerHeight();
+
+    // Add event listener to recalculate height when the window is resized
+    window.addEventListener('resize', setChartContainerHeight);
+
+    // Initialize the chart
+    const chartOptions = {
+        layout: {
+            textColor: 'black',
+            background: { type: 'solid', color: 'white' },
+        },
+        grid: {
+            vertLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+            horzLines: {
+                color: 'rgba(197, 203, 206, 0.5)',
+            },
+        },
+    };
+
+    // Add the candlestick series to the chart
+    const container = document.getElementById('chartContainer');
+    const chart = LightweightCharts.createChart(container, chartOptions);
+    let currentInterval = '1DAY'; // Default interval
+
+    // Add line series to the chart
+    const series = chart.addLineSeries();
+
+    const smaSeries = chart.addLineSeries({
+        color: 'rgba(60, 179, 113, 1)',
+        lineWidth: 2,
+    });
+
+    function updateChartWithNewData(newData, dcaAmountValue) {
+        let accumulatedValue = 0;
+        const updatedData = newData.map(item => {
+            accumulatedValue += dcaAmountValue / item.price_close;
+            return {
+                time: item.time_period_start,
+                value: accumulatedValue * item.price_close
+            };
+        });
+        series.setData(updatedData);
+
+        let accumulatedDCAValue = 0;
+        const dcaAmount = newData.map(item => {
+            accumulatedDCAValue += dcaAmountValue; // Simply accumulate the DCA amount for each data point
+            return {
+                time: item.time_period_start,
+                value: accumulatedDCAValue
+            };
+        });
+
+        // Convert the dcaAmount array to the correct format
+        const dcaAmountPoints = dcaAmount.map(point => ({ time: point.time, value: point.value }));
+        console.log("dcaAmountPoints:", dcaAmountPoints); // Log dcaAmountPoints to console
+        smaSeries.setData(dcaAmountPoints); // Set the data for the smaSeries
+    }
+
+    function getDefaultStartDate() {
+        // return default end date here, e.g., tomorrow's date
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 1460); // Increment current date by 1 day
+        return startDate.toISOString().slice(0, 10); // Returns tomorrow's date in "YYYY-MM-DD" format
+    }
+
+    function getDefaultEndDate() {
+        // return default end date here, e.g., tomorrow's date
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 1); // Increment current date by 1 day
+        return endDate.toISOString().slice(0, 10); // Returns tomorrow's date in "YYYY-MM-DD" format
+    }
+
+    function getDefaultDcaAmount() {
+        // return default DCA amount here
+        return 100; // Example default DCA amount
+    }
+
+    function getDefaultFrequency() {
+        // return default frequency here
+        return "daily"; // Example default frequency
+    }
+
+    $(document).ready(function() {
+        startDate = getDefaultStartDate();
+        endDate = getDefaultEndDate();
+
+        // Date Picker 1
+        $( "#datepicker1" ).datepicker({
+            dateFormat: "yy-mm-dd",
+            onSelect: function(selectedDate) {
+                startDate = selectedDate; // Save selected start date
+            }
+        });
+
+        // Date Picker 2
+        $( "#datepicker2" ).datepicker({
+            dateFormat: "yy-mm-dd",
+            onSelect: function(selectedDate) {
+                endDate = selectedDate; // Save selected end date
+            }
+        });
+
+        // Set default values in input boxes
+        $("#datepicker1").val(startDate);
+        $("#datepicker2").val(endDate);
+        $("#numberInput").val(dcaAmount);
+
+        processValues();
+    });
+
+    function calculateDaysDifference(startDate, endDate) {
+        // Convert start and end dates to Date objects
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        // Calculate the difference in milliseconds
+        const differenceInMs = end - start;
+
+        // Convert milliseconds to days
+        const daysDifference = differenceInMs / (1000 * 60 * 60 * 24);
+
+        // Return the number of days (rounded to the nearest integer)
+        return Math.round(daysDifference);
+    }
+
+    // Function to fetch data from the API endpoint and process it
+    async function processValues() {
+    try {
+        // Fetch data from API based on user input
+        const startDateValue = $("#datepicker1").val().replace(/\//g, '-');
+        const endDateValue = $("#datepicker2").val().replace(/\//g, '-');
+        const dcaAmountValue = parseInt($("#numberInput").val()); // Convert to number
+        const frequencyValue = $("#frequencySelect").val();
+        const daysBetweenStartAndEnd = calculateDaysDifference(startDateValue, endDateValue);
+
+        const totalDcaAmount = daysBetweenStartAndEnd * dcaAmountValue;
+
+        const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=${'$'}{startDateValue}T00:00:00&limit=${'$'}{daysBetweenStartAndEnd}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${'$'}{response.status} ${'$'}{response.statusText}`);
+        }
+        const apiData = await response.json();
+
+        // Process the fetched data
+        const totalAdded = apiData.reduce((total, item) => {
+            // Perform calculation and add it to total
+            return total + (dcaAmountValue / item.price_close);
+        }, 0);
+
+        console.log("Total BTC Accumulated:", totalAdded);
+        console.log("Days between: ", calculateDaysDifference(startDateValue, endDateValue));
+
+        updateChartWithNewData(apiData, dcaAmountValue);
+
+        // Calculate profit
+        const profit = (totalAdded * apiData[apiData.length - 1].price_close - totalDcaAmount).toFixed(2);
+
+        // Determine color based on profit
+        const profitColor = profit >= 0 ? 'green' : 'red';
+
+        // Display total DCA amount on the page
+        //const totalDcaContainer = document.getElementById('totalDcaContainer');
+        //totalDcaContainer.innerHTML = `
+        //    <p>Total DCA Amount: ${'$'}${'$'}{totalDcaAmount.toLocaleString('en-US', {maximumFractionDigits: 2})} Current amount: ${'$'}${'$'}{(totalAdded * apiData[apiData.length - 1].price_close).toLocaleString('en-US', {maximumFractionDigits: 2})} Profit: <span style="color: ${'$'}{profitColor}">${'$'}${'$'}{profit.toLocaleString('en-US', {maximumFractionDigits: 2})}</span></p>
+        //`;
+
+        // After updating the content, recalculate the chart container height
+        setChartContainerHeight();
+
+    } catch (error) {
+        console.error('Error processing data:', error);
+    }
+}
+</script>
+
+</body>
+</html>
+    """.trimIndent()
+    }
 }
 

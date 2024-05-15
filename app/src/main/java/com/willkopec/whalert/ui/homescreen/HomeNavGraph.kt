@@ -68,9 +68,7 @@ fun HomeNavGraph(
         }
 
         composable(route = DashboardNavigation.DcaSimulator.route) {
-            ScreenContent(name = "TODO:DCA SIMULATOR") {
-
-            }
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="dca_simulator")
         }
         composable(route = DashboardNavigation.ToolsPage.route) {
             ScreenContent(name = "TODO:ToolsPage") {

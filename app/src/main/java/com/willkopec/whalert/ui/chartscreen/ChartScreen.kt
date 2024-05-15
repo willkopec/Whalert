@@ -68,6 +68,7 @@ import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorDarkMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getDcaSimulatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicator
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getTwoYearMAMultiplierIndicatorDarkMode
@@ -291,6 +292,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
                 "picycle" -> return getPiCycleTopIndicator(700)
                 "profitable_days" -> return getBtcProfitableDaysIndicatorDarkMode()
                 "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorDarkMode()
+                "dca_simulator" -> return getDcaSimulatorLightMode()
                 else -> return getPiCycleTopIndicator(700)
             }
         } else {
@@ -298,6 +300,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
                 "picycle" -> return getPiCycleTopIndicator(700)
                 "profitable_days" -> return getBtcProfitableDaysIndicatorLightMode()
                 "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorLightMode()
+                "dca_simulator" -> return getDcaSimulatorLightMode()
                 else -> return getPiCycleTopIndicator(700)
             }
         }
