@@ -71,6 +71,12 @@ data class IndicatorListItemInfo(
                     description = "This indicator uses the 2 year moving average and 5x the 2 year moving average to give good a good range of where the bitcoin price should be and any values outside of these moving averages should indicate under or over valued prices.",
                     indicatorID = "2y_ma_multiplier",
                     chartImage = ""
+                ),
+                IndicatorListItemInfo(
+                    name = "Puell Multiple",
+                    description = "This metric looks at the supply side of Bitcoin's economy - bitcoin miners and their revenue. It explores market cycles from a mining revenue perspective.The chart above highlights periods where the value of Bitcoin's issued on a daily basis has historically been extremely low (Puell Multiple entering green box), which produced outsized returns for Bitcoin investors who bought Bitcoin here. It also shows periods where the daily issuance value was extremely high (Puell Multiple entering red box), providing advantageous profit-taking for Bitcoin investors who sold here.",
+                    indicatorID = "puell_multiple",
+                    chartImage = ""
                 )
             )
 
@@ -127,15 +133,21 @@ data class IndicatorListItemInfo(
                 verticalAlignment = Alignment.CenterVertically // Center items vertically
             ) {
 
-                Text(
-                    text = indicatorData.name,
-                    fontSize = 14.sp
-                )
+                Column(modifier = Modifier
+                    .weight(0.35f)
+                    .padding(horizontal = 8.dp)
+                ){
+                    Text(
+                        text = indicatorData.name,
+                        fontSize = 14.sp
+                    )
+                }
+
 
                 Column(
                     modifier = Modifier
                         .weight(0.65f)
-                        .padding(horizontal = 16.dp) // Add horizontal padding
+                        .padding(horizontal = 8.dp) // Add horizontal padding
                 ) {
                     Text(
                         text = indicatorData.description,
