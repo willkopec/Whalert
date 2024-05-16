@@ -8,25 +8,32 @@
 ##### - Favorites list used to keep track of different cryptos (Includes a custom risk level indicator calculated by comparing the 50day and 350 day moving average + accounting for diminishing returns). ✅
 ##### - Bitcoin Pi cycle Top Indicator: Used to predict the cycle top within 3 days of the yellow moving average crossing over the blue moving average. (Made in 2019) ✅
 ##### - Bitcoin Profitable Days Indicator: An indicator which creates a threshold value of the closing price of the previous day's close and calculates all of the days that would be profitable if you bought everyday and sold at that threshold value. ✅
+##### - Bitcoin DCA Simulator: A tool which allows you to select a start and end date with a dollar amount frequency and this tool will simulate buys at the frequency and show you the value of your investment over time compared to the amount you invested over time. ✅
 
 #### To be added:
-#### - DCA Simulator 
-#### - Sentiment 
-#### - Top movers list 
-#### - Settings screen for light/dark mode
-#### - Back button on top bar for certain screens/navigation
-#### - Modify top bar
-#### - More Indicators
+##### - More Indicators
+##### - Sentiment 
+##### - Top movers list 
+##### - Settings screen for light/dark mode
+##### - Back button on top bar for certain screens/navigation
+##### - Modify top bar
+
 
 ### Images:
 ![whalert screen1](https://github.com/willkopec/Whalert/assets/85149000/a87829f3-14c6-447d-af7d-0fc9ecda6699)
 ![whalert screen2](https://github.com/willkopec/Whalert/assets/85149000/e366aa4a-356e-4b73-bd00-2e3223d6ad94)
 ![whalert screen3](https://github.com/willkopec/Whalert/assets/85149000/6ff609dc-7b71-4167-9274-657fe58b0215)
-![whalert indicators list](https://github.com/willkopec/Whalert/assets/85149000/4c5ee55d-b691-4b24-91bf-22f9aeb208df)
+![whalert indicators list](https://github.com/willkopec/Whalert/assets/85149000/b2ec6464-647b-47c5-95aa-d569909d4326)
+
 ##### Btc Pi cycle top:
 ![whalert pi cycle](https://github.com/willkopec/Whalert/assets/85149000/2aad4778-5f2a-4873-b586-14e00c59fb65)
 ![whalert pi cycle landscape](https://github.com/willkopec/Whalert/assets/85149000/8fc1fb09-c2a9-46f2-8c6b-dfe5d1677e3b)
 ##### Btc Profitable Days:
 ![whalert btc days profitable indicator](https://github.com/willkopec/Whalert/assets/85149000/a2937a3e-4e53-4497-b072-43badf900cf3)
 ![whalert btc days profitable indicator landscape](https://github.com/willkopec/Whalert/assets/85149000/de55b70a-cccd-46e1-988a-45e2428308d5)
-
+##### Btc 2 Year MA Indicator:
+![whalert btc 2yma](https://github.com/willkopec/Whalert/assets/85149000/592a2433-fab1-4a5a-9c27-aebfa10d97b9)
+![whalert btc 2yma landscape](https://github.com/willkopec/Whalert/assets/85149000/05b2ca1d-759a-442b-ac0e-9383ae903736)
+##### Btc Puell Multiple Indicator:
+![whalert puell multiple](https://github.com/willkopec/Whalert/assets/85149000/54392ea0-d20a-43bc-924f-ea26c106a9c3)
+![whalert puell multiple landscape](https://github.com/willkopec/Whalert/assets/85149000/62ca4faa-c7bd-4dbf-9054-294a000872a9)
