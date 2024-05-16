@@ -37,3 +37,6 @@
 ##### Btc Puell Multiple Indicator:
 ![whalert puell multiple](https://github.com/willkopec/Whalert/assets/85149000/54392ea0-d20a-43bc-924f-ea26c106a9c3)
 ![whalert puell multiple landscape](https://github.com/willkopec/Whalert/assets/85149000/62ca4faa-c7bd-4dbf-9054-294a000872a9)
+##### Btc DCA Simulator:
+![whalert dca simulator](https://github.com/willkopec/Whalert/assets/85149000/31598919-545a-4b3a-b53d-c70f112827f4)
+![whalert dca simulator landscape](https://github.com/willkopec/Whalert/assets/85149000/4a07d9f7-29d0-4d3b-b68b-6548dc916ad7)
