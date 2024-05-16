@@ -2333,10 +2333,15 @@ const series = chart.addLineSeries();
         lineWidth: 2,
     });
 
-    function updateChartWithNewData(newData, dcaAmountValue) {
+    function updateChartWithNewData(newData, dcaAmountValue, frequencyValue) {
         let accumulatedValue = 0;
+		let currentDays = 0;
+		
         const updatedData = newData.map(item => {
-            accumulatedValue += dcaAmountValue / item.price_close;
+			if(frequencyValue == "daily" || (frequencyValue == "weekly" && currentDays % 7 == 0) || (frequencyValue == "monthly" && currentDays % 30 == 0)){
+				accumulatedValue += dcaAmountValue / item.price_close;
+			}
+            currentDays+=1;
             return {
                 time: item.time_period_start,
                 value: accumulatedValue * item.price_close
@@ -2344,10 +2349,15 @@ const series = chart.addLineSeries();
         });
         series.setData(updatedData);
 
+		currentDays = 0;
         let accumulatedDCAValue = 0;
+		
         const dcaAmount = newData.map(item => {
-            accumulatedDCAValue += dcaAmountValue; // Simply accumulate the DCA amount for each data point
-            return {
+			if(frequencyValue == "daily" || (frequencyValue == "weekly" && currentDays % 7 == 0) || (frequencyValue == "monthly" && currentDays % 30 == 0)){
+				accumulatedDCAValue += dcaAmountValue; // Simply accumulate the DCA amount for each data point
+            }
+			currentDays+=1;
+			return {
                 time: item.time_period_start,
                 value: accumulatedDCAValue
             };
@@ -2453,7 +2463,7 @@ const series = chart.addLineSeries();
         console.log("Total BTC Accumulated:", totalAdded);
         console.log("Days between: ", calculateDaysDifference(startDateValue, endDateValue));
 
-        updateChartWithNewData(apiData, dcaAmountValue);
+        updateChartWithNewData(apiData, dcaAmountValue, frequencyValue);
 
         // Calculate profit
         const profit = (totalAdded * apiData[apiData.length - 1].price_close - totalDcaAmount).toFixed(2);
