@@ -255,8 +255,8 @@ fun dashboardHeader(navController: NavHostController){
     listOf(
         DashboardNavigation.IndicatorsPage,
         DashboardNavigation.DcaSimulator,
-        DashboardNavigation.ToolsPage,
         DashboardNavigation.AnalyticsPage,
+        DashboardNavigation.ToolsPage,
         DashboardNavigation.SentimentPage
     )
 

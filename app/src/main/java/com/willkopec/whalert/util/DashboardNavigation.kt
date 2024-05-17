@@ -18,15 +18,15 @@ sealed class DashboardNavigation(
         route = "dcasim",
         icon = R.drawable.baseline_price_check_24
     )
-    object ToolsPage : DashboardNavigation(
-        title = "Tools",
-        route = "tools",
-        icon = R.drawable.baseline_build_24
-    )
     object AnalyticsPage : DashboardNavigation(
         title = "Analytics",
         route = "analytics",
         icon = R.drawable.baseline_query_stats_24
+    )
+    object ToolsPage : DashboardNavigation(
+        title = "Tools",
+        route = "tools",
+        icon = R.drawable.baseline_build_24
     )
     object SentimentPage : DashboardNavigation(
         title = "Sentiment",

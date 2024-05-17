@@ -3333,5 +3333,218 @@ function findHalvingEvent(date, halvingEvents) {
 </html>
     """.trimIndent()
     }
+
+    fun getMonthlyGains() : String{
+        return """
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitcoin Monthly Performance</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+      overflow-x: auto;
+    }
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: center;
+      padding: 8px;
+      white-space: nowrap;
+    }
+    th {
+      background-color: transparent;
+    }
+    .positive {
+      background-color: lightgreen;
+    }
+    .negative {
+      background-color: lightcoral;
+    }
+	
+	/* Centering the h3 tag */
+	h3 {
+	  text-align: center;
+	}
+	
+	/* Responsive styles */
+    @media screen and (max-width: 768px) {
+      table {
+        font-size: 9px; /* Reduce font size for smaller screens */
+      }
+    }
+  </style>
+</head>
+<body>
+<h3>Bitcoin Monthly Performance</h3>
+<div style="overflow-x: auto;">
+  <table id="btcTable">
+    <thead>
+      <tr>
+        <th>Year</th>
+        <th>Jan  </th>
+        <th>Feb  </th>
+        <th>Mar  </th>
+        <th>Apr  </th>
+        <th>May  </th>
+        <th>Jun  </th>
+        <th>Jul  </th>
+        <th>Aug  </th>
+        <th>Sep  </th>
+        <th>Oct  </th>
+        <th>Nov  </th>
+        <th>Dec  </th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+
+<!-- New table for win/loss -->
+
+<div style="overflow-x: auto;">
+  <table id="btcPerformanceTable">
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Wins</th>
+        <th>Losses</th>
+        <th>Percentage Win</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Function to fetch data from the API and generate the table
+  async function generateTable() {
+    var tableBody = document.querySelector('#btcTable tbody');
+    var years = [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]; // Add more years as needed
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // Fetch data from the API
+    const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1MTH&time_start=2012-01-01T00:00:00&limit=500');
+    const data = await response.json();
+
+    // Prepare an object to hold percentage gains for each month/year
+    var percentageData = {};
+    years.forEach(year => {
+      percentageData[year] = {};
+      months.forEach(month => {
+        percentageData[year][month] = null; // Initialize to null
+      });
+    });
+
+    // Calculate percentage gains and update the object
+    data.forEach(entry => {
+      const year = parseInt(entry.time_period_start.substr(0, 4));
+      const month = parseInt(entry.time_period_start.substr(5, 2)) - 1; // Months are zero-based in JavaScript
+      const percentageGain = ((entry.price_close - entry.price_open) / entry.price_close) * 100;
+      if (!isNaN(percentageGain)) { // Check if percentageGain is not NaN
+        percentageData[year][months[month]] = percentageGain.toFixed(2) + '%';
+
+        // Add class to cell based on percentage gain
+        if (percentageGain > 0) {
+          percentageData[year][months[month] + '_class'] = 'positive';
+        } else if (percentageGain < 0) {
+          percentageData[year][months[month] + '_class'] = 'negative';
+        }
+      }
+    });
+
+    // Generate table rows
+    years.forEach(year => {
+      var row = document.createElement('tr');
+      var yearCell = document.createElement('td');
+      yearCell.textContent = year;
+      row.appendChild(yearCell);
+
+      months.forEach(month => {
+        var cell = document.createElement('td');
+        cell.textContent = percentageData[year][month] || '-'; // Display '-' for missing data
+        if (percentageData[year][month + '_class']) {
+          cell.classList.add(percentageData[year][month + '_class']); // Add class to cell
+        }
+        row.appendChild(cell);
+      });
+
+      tableBody.appendChild(row);
+    });
+  }
+
+  // Call the function to generate the percentage gains table
+  generateTable();
+
+  // Function to fetch data from the API and generate the performance table
+  async function generatePerformanceTable() {
+    var tableBody = document.querySelector('#btcPerformanceTable tbody');
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // Fetch data from the API (same as previous function)
+    const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1MTH&time_start=2012-01-01T00:00:00&limit=500');
+    const data = await response.json();
+
+    // Prepare objects to hold wins, losses, and total gains for each month (same as previous function)
+    var wins = {};
+    var losses = {};
+    var totalGains = {};
+    months.forEach(month => {
+      wins[month] = 0;
+      losses[month] = 0;
+      totalGains[month] = 0;
+    });
+
+    // Calculate wins, losses, and total gains (same as previous function)
+    data.forEach(entry => {
+      const month = parseInt(entry.time_period_start.substr(5, 2)) - 1;
+      const percentageGain = ((entry.price_close - entry.price_open) / entry.price_close) * 100;
+
+      if (!isNaN(percentageGain)) { // Check if percentageGain is not NaN
+        if (percentageGain > 0) {
+          wins[months[month]]++;
+        } else if (percentageGain < 0) {
+          losses[months[month]]++;
+        }
+        totalGains[months[month]] += percentageGain;
+      }
+    });
+
+    // Generate table rows (same as previous function)
+    months.forEach(month => {
+      var row = document.createElement('tr');
+      var monthCell = document.createElement('td');
+      monthCell.textContent = month;
+      row.appendChild(monthCell);
+
+      var winsCell = document.createElement('td');
+      winsCell.textContent = wins[month];
+      row.appendChild(winsCell);
+
+      var lossesCell = document.createElement('td');
+      lossesCell.textContent = losses[month];
+      row.appendChild(lossesCell);
+
+      var percentageWinCell = document.createElement('td');
+      var percentageWin = ((wins[month] / (wins[month] + losses[month])) * 100).toFixed(2);
+      percentageWinCell.textContent = isNaN(percentageWin) ? '-' : percentageWin + '%';
+      row.appendChild(percentageWinCell);
+
+      tableBody.appendChild(row);
+    });
+  }
+
+  // Call the function to generate the performance table
+  generatePerformanceTable();
+</script>
+
+</body>
+</html>
+    """.trimIndent()
+    }
 }
 

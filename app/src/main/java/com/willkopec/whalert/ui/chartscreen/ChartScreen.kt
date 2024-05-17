@@ -54,6 +54,7 @@ import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndic
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDcaSimulatorLightMode
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getMonthlyGains
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicatorDarkMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPuellMultipleIndicatorDarkMode
@@ -238,35 +239,6 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
     var indexTwo = 0
 
     val lineDataScript = StringBuilder()
-    timePriceData.forEach { result ->
-
-        if(indexOne == 0){
-            lineDataScript.append("{ time: '${result.time_period_start}', value: ${result.price_close} }")
-        } else if(indexOne > 0){
-            lineDataScript.append("                    { time: '${result.time_period_start}', value: ${result.price_close} }")
-        }
-
-        if(indexOne < timePriceData.size - 1){
-            lineDataScript.append(",\n")
-        }
-        indexOne++
-    }
-
-    val barDataScript = StringBuilder()
-    timePriceData.forEach { result ->
-
-
-        if(indexTwo == 0){
-            barDataScript.append("{ time: '${result.time_period_start}', open: ${result.price_open}, high: ${result.price_high}, low: ${result.price_low}, close: ${result.price_close} },")
-        } else {
-            barDataScript.append("                    { time: '${result.time_period_start}', open: ${result.price_open}, high: ${result.price_high}, low: ${result.price_low}, close: ${result.price_close} }")
-        }
-
-        if(indexTwo < timePriceData.size - 1){
-            barDataScript.append(",\n")
-        }
-        indexTwo++
-    }
 
     if(currentIndicator == null){
         if(chartType == "bar" && !darkTheme){
@@ -282,6 +254,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
                 "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorDarkMode()
                 "dca_simulator" -> return getDcaSimulatorLightMode()
                 "puell_multiple" -> return getPuellMultipleIndicatorDarkMode()
+                "monthly_gains_chart" -> return getMonthlyGains()
                 else -> return getPiCycleTopIndicatorDarkMode(700)
             }
         } else {
@@ -291,6 +264,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
                 "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorLightMode()
                 "dca_simulator" -> return getDcaSimulatorLightMode()
                 "puell_multiple" -> return getPuellMultipleIndicatorLightMode()
+                "monthly_gains_chart" -> return getMonthlyGains()
                 else -> return getPiCycleTopIndicatorDarkMode(700)
             }
         }

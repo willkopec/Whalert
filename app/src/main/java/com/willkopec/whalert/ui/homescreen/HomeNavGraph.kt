@@ -81,9 +81,7 @@ fun HomeNavGraph(
             }
         }
         composable(route = DashboardNavigation.AnalyticsPage.route) {
-            ScreenContent(name = "TODO:AnalyticsPage") {
-
-            }
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="monthly_gains_chart")
         }
 
         detailsNavGraph(navController = navController)
