@@ -1,27 +1,20 @@
 package com.willkopec.whalert.ui.chartscreen
 
-import android.content.Context
 import android.util.Log
 import android.webkit.WebView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -29,7 +22,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -38,13 +30,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.MutableLiveData
 import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
@@ -59,18 +47,17 @@ import com.patrykandpatrick.vico.core.component.shape.shader.DynamicShaders
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.FloatEntry
 import com.willkopec.whalert.breakingnews.WhalertViewModel
-import com.willkopec.whalert.model.polygon.Result
 import com.willkopec.whalert.ui.homescreen.RetrySection
-import com.willkopec.whalert.*
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
-import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChart
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorDarkMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDcaSimulatorLightMode
-import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicator
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicatorDarkMode
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPuellMultipleIndicatorDarkMode
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getPuellMultipleIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getStandardChartContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getTwoYearMAMultiplierIndicatorDarkMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getTwoYearMAMultiplierIndicatorLightMode
@@ -290,20 +277,21 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
     } else {
         if(darkTheme){
             when(currentIndicator){
-                "picycle" -> return getPiCycleTopIndicator(700)
+                "picycle" -> return getPiCycleTopIndicatorDarkMode(700)
                 "profitable_days" -> return getBtcProfitableDaysIndicatorDarkMode()
                 "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorDarkMode()
                 "dca_simulator" -> return getDcaSimulatorLightMode()
                 "puell_multiple" -> return getPuellMultipleIndicatorDarkMode()
-                else -> return getPiCycleTopIndicator(700)
+                else -> return getPiCycleTopIndicatorDarkMode(700)
             }
         } else {
             when(currentIndicator){
-                "picycle" -> return getPiCycleTopIndicator(700)
+                "picycle" -> return getPiCycleTopIndicatorLightMode(700)
                 "profitable_days" -> return getBtcProfitableDaysIndicatorLightMode()
                 "2y_ma_multiplier" -> return getTwoYearMAMultiplierIndicatorLightMode()
-                "puell_multiple" -> return getPuellMultipleIndicatorDarkMode()
-                else -> return getPiCycleTopIndicator(700)
+                "dca_simulator" -> return getDcaSimulatorLightMode()
+                "puell_multiple" -> return getPuellMultipleIndicatorLightMode()
+                else -> return getPiCycleTopIndicatorDarkMode(700)
             }
         }
 
