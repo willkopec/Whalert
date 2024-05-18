@@ -9,6 +9,7 @@
 ##### - Bitcoin Pi cycle Top Indicator: Used to predict the cycle top within 3 days of the yellow moving average crossing over the blue moving average. (Made in 2019) ✅
 ##### - Bitcoin Profitable Days Indicator: An indicator which creates a threshold value of the closing price of the previous day's close and calculates all of the days that would be profitable if you bought everyday and sold at that threshold value. ✅
 ##### - Bitcoin DCA Simulator: A tool which allows you to select a start and end date with a dollar amount frequency and this tool will simulate buys at the frequency and show you the value of your investment over time compared to the amount you invested over time. ✅
+##### - Bitcoin Monthly Gains (Analytics page): This indicator/screen shows a table of every year and month in bitcoin and the value of each cooresponds to the percentage gains for that year/month. The chart under that one shows the percentage win for each month in crypto (# Wins for that month - # of losses for that month / # Wins for that month). This page is used to show the best/worst months in crypto in a very easy to understand/visual way. ✅
 
 #### To be added:
 ##### - More Indicators
@@ -40,3 +41,6 @@
 ##### Btc DCA Simulator:
 ![whalert dca simulator](https://github.com/willkopec/Whalert/assets/85149000/31598919-545a-4b3a-b53d-c70f112827f4)
 ![whalert dca simulator landscape](https://github.com/willkopec/Whalert/assets/85149000/4a07d9f7-29d0-4d3b-b68b-6548dc916ad7)
+##### Btc Monthly Gains:
+![whalert monthly performance](https://github.com/willkopec/Whalert/assets/85149000/f2c0d9d1-f412-47db-9fc8-95c5a14b51a5)
+![whalert monthly performance2](https://github.com/willkopec/Whalert/assets/85149000/d86cf1e0-6700-4a8f-aca1-5d803a0ff708)
