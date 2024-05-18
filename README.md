@@ -9,7 +9,7 @@
 ##### - Bitcoin Pi cycle Top Indicator: Used to predict the cycle top within 3 days of the yellow moving average crossing over the blue moving average. (Made in 2019) ✅
 ##### - Bitcoin Profitable Days Indicator: An indicator which creates a threshold value of the closing price of the previous day's close and calculates all of the days that would be profitable if you bought everyday and sold at that threshold value. ✅
 ##### - Bitcoin DCA Simulator: A tool which allows you to select a start and end date with a dollar amount frequency and this tool will simulate buys at the frequency and show you the value of your investment over time compared to the amount you invested over time. ✅
-##### - Bitcoin Monthly Gains (Analytics page): This indicator/screen shows a table of every year and month in bitcoin and the value of each cooresponds to the percentage gains for that year/month. The chart under that one shows the percentage win for each month in crypto (# Wins for that month - # of losses for that month / # Wins for that month). This page is used to show the best/worst months in crypto in a very easy to understand/visual way. ✅
+##### - Bitcoin Monthly Gains (Analytics page): This indicator/screen shows a table of every year and month in bitcoin and the value of each cooresponds to the percentage gains for that year/month. The chart under that one shows the percentage win for each month in crypto (# Wins for that month / # Wins for that month + # Losses for that month). This page is used to show the best/worst months in crypto in a very easy to understand/visual way. ✅
 
 #### To be added:
 ##### - More Indicators
