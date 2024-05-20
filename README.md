@@ -7,11 +7,12 @@
 ##### - Both Light/Dark mode with Material 3 topbar ✅
 ##### - Bubble chart for all coins listed on CoinGecko ✅
 ##### - Easy to use interactive charts with both Candle and Line chart options. Chart data is live, constantly refreshed and resizing is adjusted automatically for landscape/portrait modes of all screen sizes/types ✅
-##### - Favorites list used to keep track of different cryptos (Includes a custom risk level indicator calculated by comparing the 50day and 350 day moving average + accounting for diminishing returns). ✅
+##### - Favorites list used to keep track of different cryptos (Includes a custom risk level indicator calculated by comparing the 50day and 350 day moving average + accounting for diminishing returns) ✅
 ##### - Bitcoin Pi cycle Top Indicator: Used to predict the cycle top within 3 days of the yellow moving average crossing over the blue moving average. (Made in 2019) ✅
 ##### - Bitcoin Profitable Days Indicator: An indicator which creates a threshold value of the closing price of the previous day's close and calculates all of the days that would be profitable if you bought everyday and sold at that threshold value. ✅
 ##### - Bitcoin DCA Simulator: A tool which allows you to select a start and end date with a dollar amount frequency and this tool will simulate buys at the frequency and show you the value of your investment over time compared to the amount you invested over time. (Other crypto options coming soon) ✅
-##### - Bitcoin Monthly Gains (Analytics page): This indicator/screen shows a table of every year and month in bitcoin and the value of each cooresponds to the percentage gains for that year/month. The chart under that one shows the percentage win for each month in crypto (# Wins for that month / # Wins for that month + # Losses for that month). This page is used to show the best/worst months in crypto in a very easy to understand/visual way. ✅
+##### - Bitcoin Monthly Gains (Analytics page): This indicator/screen shows a table of every year and month in bitcoin and the value of each cooresponds to the percentage gains for that year/month. The chart under that one shows the percentage win for each month in crypto (# Wins for that month / # Wins for that month + # Losses for that month). This page is used to show the best/worst months in crypto in a very easy to understand/visual way ✅
+##### - News section: A news screen which provides an updated feed of crypto related news to keep you updated on whats going on in crypto ✅
 
 #### To be added/updated:
 ###### ---------------------
@@ -20,7 +21,6 @@
 ##### - Settings screen for light/dark mode instead of on the top bar
 ##### - Back button on top bar for certain screens/navigation
 ##### - Modify top bar
-##### - News/Sentiment section
 ##### - Different Color Schemes
 ##### - On-chain Data/Analysis
 ##### - ETF In/out flows page
@@ -28,7 +28,7 @@
 ### Images:
 ![whalert screen1](https://github.com/willkopec/Whalert/assets/85149000/a87829f3-14c6-447d-af7d-0fc9ecda6699)
 ![whalert screen2](https://github.com/willkopec/Whalert/assets/85149000/698e8e43-a075-4171-b2ac-459924148d84)
-![whalert screen3](https://github.com/willkopec/Whalert/assets/85149000/6ff609dc-7b71-4167-9274-657fe58b0215)
+![whalert screen3](https://github.com/willkopec/Whalert/assets/85149000/91ac7dcc-51b4-48a3-a2fc-8a1def286e9b)
 ![indicators list screen](https://github.com/willkopec/Whalert/assets/85149000/2d8e070f-2120-4b26-9837-7e57980010f2)
 
 ##### Btc Pi cycle top:
@@ -49,5 +49,7 @@
 ##### Btc Monthly Gains:
 ![whalert monthly performance](https://github.com/willkopec/Whalert/assets/85149000/f2c0d9d1-f412-47db-9fc8-95c5a14b51a5)
 ![whalert monthly performance2](https://github.com/willkopec/Whalert/assets/85149000/d86cf1e0-6700-4a8f-aca1-5d803a0ff708)
+##### News screen:
+![whalert news screen](https://github.com/willkopec/Whalert/assets/85149000/b958f346-69d4-4f9f-a784-17d02b9a2639)
 ##### Feedback/Report/Suggestions page:
 ![feedback screen](https://github.com/willkopec/Whalert/assets/85149000/7c525922-5c3e-4e1c-8da2-028ab6549fcb)
