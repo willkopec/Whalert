@@ -3,6 +3,7 @@
 #### This application is still under developement and constantly being updated!
 
 #### Features:
+###### ----------------------
 ##### - Bubble chart for all coins listed on CoinGecko ✅
 ##### - Easy to use interactive charts with both Candle and Line chart options. Chart data is live, constantly refreshed and resizing is adjusted automatically for landscape/portrait modes of all screen sizes/types ✅
 ##### - Favorites list used to keep track of different cryptos (Includes a custom risk level indicator calculated by comparing the 50day and 350 day moving average + accounting for diminishing returns). ✅
@@ -11,14 +12,17 @@
 ##### - Bitcoin DCA Simulator: A tool which allows you to select a start and end date with a dollar amount frequency and this tool will simulate buys at the frequency and show you the value of your investment over time compared to the amount you invested over time. ✅
 ##### - Bitcoin Monthly Gains (Analytics page): This indicator/screen shows a table of every year and month in bitcoin and the value of each cooresponds to the percentage gains for that year/month. The chart under that one shows the percentage win for each month in crypto (# Wins for that month / # Wins for that month + # Losses for that month). This page is used to show the best/worst months in crypto in a very easy to understand/visual way. ✅
 
-#### To be added:
+#### To be added/updated:
+###### ---------------------
 ##### - More Indicators
-##### - Sentiment 
-##### - Top movers list 
-##### - Settings screen for light/dark mode
+##### - Feedback screen on indicators list to get feedback/reports from users.
+##### - Settings screen for light/dark mode instead of on the top bar
 ##### - Back button on top bar for certain screens/navigation
 ##### - Modify top bar
-
+##### - News/Sentiment section
+##### - Different Color Schemes
+##### - On-chain Data/Analysis
+##### - Start up / loading page when loading into app for better performance.
 
 ### Images:
 ![whalert screen1](https://github.com/willkopec/Whalert/assets/85149000/a87829f3-14c6-447d-af7d-0fc9ecda6699)
