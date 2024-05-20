@@ -3546,5 +3546,133 @@ function findHalvingEvent(date, halvingEvents) {
 </html>
     """.trimIndent()
     }
+
+    fun getFeedbackPage() : String{
+        return """
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Me</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            position: relative;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px; /* Add some space below the title */
+        }
+
+        input,
+        textarea {
+            width: calc(100% - 20px); /* Adjust width minus padding and border */
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: calc(100% - 20px); /* Adjust width minus padding and border */
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        span {
+            display: block;
+            margin-top: 10px;
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Feedback/Reports</h2>
+        <form name="submit-to-google-sheet">
+            <input type="text" name="Name" placeholder="Your Name*" required>
+            <input type="email" name="Email" placeholder="Your Email (Optional)">
+            <textarea name="Message" rows="6" placeholder="Your Message*" required></textarea>
+            <button id="submitbtn" type="submit" class="btn btn2">Submit</button>
+        </form>
+        <span id="feedbackmsg"></span>
+    </div>
+
+    <script>
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbw9ZN2zw-rlXpRS_gkhXWkfklUlGZ1mcrqAYc7WZv8fv3soPvfEfn1x_4uewrFQdapf/exec'
+        const form = document.forms['submit-to-google-sheet']
+        const feedbackmsg = document.getElementById("feedbackmsg")
+        const submitbtn = document.getElementById("submitbtn");
+
+        form.addEventListener('submit', e => {
+            submitbtn.innerHTML = "Submitting..."
+            e.preventDefault()
+            fetch(scriptURL, { method: 'POST', body: new FormData(form) })
+                .then(response => {
+                    if (response.ok) {
+                        feedbackmsg.innerHTML = "Report sent successfully. Thank you for your feedback!";
+                        feedbackmsg.classList.remove("error");
+                    } else {
+                        throw new Error('Network response was not ok.');
+                    }
+                    submitbtn.innerHTML = "Submit";
+                    setTimeout(function () {
+                        feedbackmsg.innerHTML = "";
+                    }, 5000);
+                    form.reset();
+
+                })
+                .catch(error => {
+                    feedbackmsg.innerHTML = "Error! Something went wrong :/";
+                    feedbackmsg.classList.add("error");
+                });
+        });
+    </script>
+
+</body>
+
+</html>
+
+    """.trimIndent()
+    }
 }
 

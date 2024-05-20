@@ -54,6 +54,7 @@ import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndic
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getBtcProfitableDaysIndicatorLightMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDarkModeBarChartHtmlContent
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getDcaSimulatorLightMode
+import com.willkopec.whalert.util.ChartHtmlContentUtil.getFeedbackPage
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getMonthlyGains
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicatorDarkMode
 import com.willkopec.whalert.util.ChartHtmlContentUtil.getPiCycleTopIndicatorLightMode
@@ -255,6 +256,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
                 "dca_simulator" -> return getDcaSimulatorLightMode()
                 "puell_multiple" -> return getPuellMultipleIndicatorDarkMode()
                 "monthly_gains_chart" -> return getMonthlyGains()
+                "feedback" -> return getFeedbackPage()
                 else -> return getPiCycleTopIndicatorDarkMode(700)
             }
         } else {
@@ -265,6 +267,7 @@ fun getHtmlContent(timePriceData: List<CoinAPIResultItem>, name: String?, chartT
                 "dca_simulator" -> return getDcaSimulatorLightMode()
                 "puell_multiple" -> return getPuellMultipleIndicatorLightMode()
                 "monthly_gains_chart" -> return getMonthlyGains()
+                "feedback" -> return getFeedbackPage()
                 else -> return getPiCycleTopIndicatorDarkMode(700)
             }
         }

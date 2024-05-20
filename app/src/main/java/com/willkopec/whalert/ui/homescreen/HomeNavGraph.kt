@@ -1,7 +1,6 @@
 package com.willkopec.whalert.ui.homescreen
 
 import DraggableBubbleScreen
-import android.util.Log
 import android.webkit.WebView
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
@@ -75,10 +74,8 @@ fun HomeNavGraph(
 
             }
         }
-        composable(route = DashboardNavigation.SentimentPage.route) {
-            ScreenContent(name = "TODO:SentimentPage") {
-
-            }
+        composable(route = DashboardNavigation.FeedbackPage.route) {
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="feedback")
         }
         composable(route = DashboardNavigation.AnalyticsPage.route) {
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="monthly_gains_chart")

@@ -28,9 +28,9 @@ sealed class DashboardNavigation(
         route = "tools",
         icon = R.drawable.baseline_build_24
     )
-    object SentimentPage : DashboardNavigation(
-        title = "Sentiment",
-        route = "sentiment",
+    object FeedbackPage : DashboardNavigation(
+        title = "Feedback",
+        route = "feedback",
         icon = R.drawable.baseline_textsms_24
     )
 }
