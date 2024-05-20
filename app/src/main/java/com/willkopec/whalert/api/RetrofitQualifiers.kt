@@ -15,4 +15,8 @@ class RetrofitQualifiers {
     @Retention(AnnotationRetention.BINARY)
     annotation class CoinAPIRetrofitInstance
 
+    @Qualifier
+    @Retention(AnnotationRetention.BINARY)
+    annotation class NewsAPIRetrofitInstance
+
 }

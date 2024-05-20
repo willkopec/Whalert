@@ -6,6 +6,7 @@ import com.willkopec.whalert.api.RetrofitQualifiers
 import com.willkopec.whalert.datastore.PreferenceDatastore
 import com.willkopec.whalert.util.Constants.Companion.BASE_URL
 import com.willkopec.whalert.util.Constants.Companion.COIN_API_BASE_URL
+import com.willkopec.whalert.util.Constants.Companion.NEWS_API_BASE_URL
 import com.willkopec.whalert.util.Constants.Companion.POLYGON_BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -37,6 +38,13 @@ object AppModule {
     @RetrofitQualifiers.CoinAPIRetrofitInstance
     fun provideCoinAPIRetrofitInstance(): RetrofitInstance {
         return RetrofitInstance.getInstance(COIN_API_BASE_URL)
+    }
+
+    @Provides
+    @Singleton
+    @RetrofitQualifiers.NewsAPIRetrofitInstance
+    fun provideNewsAPIRetrofitInstance(): RetrofitInstance {
+        return RetrofitInstance.getInstance(NEWS_API_BASE_URL)
     }
 
     @Provides

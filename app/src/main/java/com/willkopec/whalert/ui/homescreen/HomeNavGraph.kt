@@ -17,6 +17,7 @@ import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
 import com.willkopec.whalert.ui.favoriteslistscreen.FavoritesListScreen
 import com.willkopec.whalert.ui.indicatorslistscreen.IndicatorsListScreenn
+import com.willkopec.whalert.ui.newsscreen.BreakingNewsListScreen
 import com.willkopec.whalert.util.BottomBarScreen
 import com.willkopec.whalert.util.DashboardNavigation
 
@@ -70,9 +71,7 @@ fun HomeNavGraph(
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="dca_simulator")
         }
         composable(route = DashboardNavigation.ToolsPage.route) {
-            ScreenContent(name = "TODO:ToolsPage") {
-
-            }
+            BreakingNewsListScreen(navController = navController)
         }
         composable(route = DashboardNavigation.FeedbackPage.route) {
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="feedback")

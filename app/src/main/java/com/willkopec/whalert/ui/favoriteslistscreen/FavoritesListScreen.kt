@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -266,7 +267,7 @@ fun dashboardHeader(navController: NavHostController){
         .clip(RoundedCornerShape(5.dp))
         .background(color = Color.LightGray)
     ) {
-        LazyColumn(contentPadding = PaddingValues(16.dp)) {
+        LazyColumn(contentPadding = PaddingValues(8.dp)) {
 
             val itemCount = dashboardItems.size / 5 + if (dashboardItems.size % 5 == 0) 0 else 1
 
@@ -286,6 +287,7 @@ fun IndicatorRows(
 ) {
     Column {
         Row(modifier = Modifier.fillMaxWidth()) {
+            Spacer(modifier = Modifier.width(16.dp))
             entries.subList(rowIndex * 5, minOf((rowIndex + 1) * 5, entries.size)).forEach { entry ->
                 Column(
                     modifier = Modifier
@@ -318,7 +320,7 @@ fun IndicatorRows(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        //Spacer(modifier = Modifier.height(8.dp))
     }
 }
 

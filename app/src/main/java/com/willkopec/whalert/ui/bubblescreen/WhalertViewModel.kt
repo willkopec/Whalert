@@ -14,8 +14,10 @@ import com.willkopec.whalert.breakingnews.CryptoCache.cachedFavoritesData
 import com.willkopec.whalert.datastore.PreferenceDatastore
 import com.willkopec.whalert.model.coinAPI.CoinAPIResultItem
 import com.willkopec.whalert.model.coingecko.CryptoItem
+import com.willkopec.whalert.model.newsAPI.Article
 import com.willkopec.whalert.repository.CoinAPIRepository
 import com.willkopec.whalert.repository.CoingeckoRepository
+import com.willkopec.whalert.repository.NewsRepository
 import com.willkopec.whalert.repository.PolygonRepository
 import com.willkopec.whalert.util.BottomBarScreen
 import com.willkopec.whalert.util.ChartType
@@ -47,6 +49,7 @@ constructor(
     @RetrofitQualifiers.CoinGeckoRetrofitInstance retrofitInstanceCoinGecko: RetrofitInstance,
     @RetrofitQualifiers.PolygonRetrofitInstance retrofitInstancePolygon: RetrofitInstance,
     @RetrofitQualifiers.CoinAPIRetrofitInstance retrofitInstanceCoinAPI: RetrofitInstance,
+    @RetrofitQualifiers.NewsAPIRetrofitInstance retrofitInstanceNewsAPI: RetrofitInstance,
     private val myPreference: MyPreference,
     private val preferenceDatastore: PreferenceDatastore,
     @ApplicationContext private val context: Context
@@ -57,6 +60,7 @@ constructor(
     private val coinGeckoRepo: CoingeckoRepository = CoingeckoRepository(retrofitInstanceCoinGecko)
     private val polygonRepo: PolygonRepository = PolygonRepository(retrofitInstancePolygon)
     private val coinApiRepo: CoinAPIRepository = CoinAPIRepository(retrofitInstanceCoinAPI)
+    private val newsApiRepo: NewsRepository = NewsRepository(retrofitInstanceNewsAPI)
 
 
     private val _isLoading = MutableStateFlow(true)
@@ -88,6 +92,9 @@ constructor(
     private val _scrollToTop = MutableLiveData(false)
     val scrollToTop: LiveData<Boolean>
         get() = _scrollToTop
+
+    private val _currentNews = MutableStateFlow<List<Article>>(emptyList())
+    val currentNews: StateFlow<List<Article>> = _currentNews
 
     private val _articleDeleted = MutableLiveData<Boolean>()
     val articleDeleted: LiveData<Boolean> = _articleDeleted
@@ -463,6 +470,39 @@ constructor(
                 else -> {}
             }
             _isLoading.value = false
+        }
+    }
+
+    fun getCryptoNews() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = newsApiRepo.getCryptoNews()
+            when (result) {
+                is Resource.Success -> {
+                    val breakingNewsArticles = result.data?.articles?.map { article ->
+                        Article(
+                            article.author,
+                            article.content,
+                            article.description,
+                            article.publishedAt,
+                            article.source,
+                            article.title,
+                            article.url,
+                            article.urlToImage
+                        )
+                    } ?: emptyList()
+
+                    _loadError.value = ""
+                    _isLoading.value = false
+                    breakingNewsPage++
+                    _currentNews.value = breakingNewsArticles
+                }
+                is Resource.Error -> {
+                    _loadError.value = result.message ?: ""
+                    _isLoading.value = false
+                }
+                else -> {}
+            }
         }
     }
 

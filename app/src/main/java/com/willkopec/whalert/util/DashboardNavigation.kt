@@ -24,9 +24,9 @@ sealed class DashboardNavigation(
         icon = R.drawable.baseline_query_stats_24
     )
     object ToolsPage : DashboardNavigation(
-        title = "Tools",
-        route = "tools",
-        icon = R.drawable.baseline_build_24
+        title = "News",
+        route = "news",
+        icon = R.drawable.baseline_newspaper_24
     )
     object FeedbackPage : DashboardNavigation(
         title = "Feedback",
