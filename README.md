@@ -28,7 +28,7 @@
 ![whalert screen1](https://github.com/willkopec/Whalert/assets/85149000/a87829f3-14c6-447d-af7d-0fc9ecda6699)
 ![whalert screen2](https://github.com/willkopec/Whalert/assets/85149000/e366aa4a-356e-4b73-bd00-2e3223d6ad94)
 ![whalert screen3](https://github.com/willkopec/Whalert/assets/85149000/6ff609dc-7b71-4167-9274-657fe58b0215)
-![whalert indicators list](https://github.com/willkopec/Whalert/assets/85149000/b2ec6464-647b-47c5-95aa-d569909d4326)
+![indicators list screen](https://github.com/willkopec/Whalert/assets/85149000/2d8e070f-2120-4b26-9837-7e57980010f2)
 
 ##### Btc Pi cycle top:
 ![whalert pi cycle](https://github.com/willkopec/Whalert/assets/85149000/2aad4778-5f2a-4873-b586-14e00c59fb65)
@@ -48,3 +48,5 @@
 ##### Btc Monthly Gains:
 ![whalert monthly performance](https://github.com/willkopec/Whalert/assets/85149000/f2c0d9d1-f412-47db-9fc8-95c5a14b51a5)
 ![whalert monthly performance2](https://github.com/willkopec/Whalert/assets/85149000/d86cf1e0-6700-4a8f-aca1-5d803a0ff708)
+##### Feedback/Report/Suggestions page:
+![feedback screen](https://github.com/willkopec/Whalert/assets/85149000/7c525922-5c3e-4e1c-8da2-028ab6549fcb)
