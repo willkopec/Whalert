@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 object CryptoCache {
     var cachedCryptoItems: List<CryptoItem> = emptyList()
@@ -62,6 +63,9 @@ constructor(
     private val coinApiRepo: CoinAPIRepository = CoinAPIRepository(retrofitInstanceCoinAPI)
     private val newsApiRepo: NewsRepository = NewsRepository(retrofitInstanceNewsAPI)
 
+
+    private val _isInitialized = MutableStateFlow(false)
+    val isInitialized: StateFlow<Boolean> = _isInitialized
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -122,17 +126,17 @@ constructor(
                 _currentChartName.value = userPreferences.currentSymbol
                 _savedList.value = userPreferences.favoritesList
 
-                if(cachedFavoritesData.size < _savedList.value.size){
-                    Log.d(TAG, "SHOULD ONLY DO THIS ONCE")
+                // Check if getFavoritesData has been called
+                if (!_isInitialized.value) {
                     getFavoritesData(50, 350)
                 }
             }
         }
-        if(cachedCryptoItems.isEmpty()){
+
+        if (cachedCryptoItems.isEmpty()) {
             Log.d(TAG, "EMPTY")
             getCryptos()
         }
-
 
         printFavoritesData()
     }
@@ -215,29 +219,22 @@ constructor(
 
     fun getFavoritesData(periodOne: Int, periodTwo: Int) {
         viewModelScope.launch {
-            Log.d(TAG, "getting DATA ${savedList.value.size}")
-            _savedList.value.forEach {
-
-                if (cachedFavoritesData[it] == null || cachedFavoritesData[it]?.isEmpty() == true) {
-                    Log.d(TAG, "size = 0 $it")
+            var symbolsProcessed: Int = 0
+            _savedList.value.forEach { symbol ->
+                Log.d(TAG, "Getting ${symbol} ${symbolsProcessed} / ${_savedList.value.size}")
+                if (cachedFavoritesData[symbol] == null || cachedFavoritesData[symbol]?.isEmpty() == true) {
                     val result = coinApiRepo.getSymbolData(
-                        convertToCoinAPIFormat(it),
+                        convertToCoinAPIFormat(symbol),
                         getDateBeforeDaysWithTime(5000),
                         5000
                     )
 
                     when (result) {
                         is Resource.Success -> {
-                            Log.d(TAG, "GOT HERE ADDING $it")
-                            _isLoading.value = false
-
                             val priceCloseList = result.data?.reversed()?.mapNotNull { it.price_close }
-                            //get the periodOne SMA for the daily
                             val smaList1 = priceCloseList?.windowed(periodOne, 1) { it.average() }
-                            //get the periodTwo SMA for the weekly (every 7th day)
                             val smaList2 = priceCloseList?.windowed(periodTwo, 1) { it.average() }
 
-                            // Calculate SMA and update CoinAPIResultItem objects
                             val updatedData = result.data?.reversed()?.mapIndexed { index, dataItem ->
                                 CoinAPIResultItem(
                                     dataItem.price_close,
@@ -250,56 +247,37 @@ constructor(
                                     dataItem.time_period_start,
                                     dataItem.trades_count,
                                     dataItem.volume_traded,
-                                    smaList1?.getOrNull(index) ?: 0.0, // Replace 0.0 with a default value if needed
-                                    smaList2?.getOrNull(index) ?: 0.0  // Replace 0.0 with a default value if needed
+                                    smaList1?.getOrNull(index) ?: 0.0,
+                                    smaList2?.getOrNull(index) ?: 0.0
                                 )
                             }
 
-                            updatedData?.get(0)?.current_risk = updatedData?.let { it1 ->
-                                getRiskLevel(
-                                    it1
-                                )
-                            }
+                            updatedData?.get(0)?.current_risk = updatedData?.let { getRiskLevel(it) }
 
                             // Update cachedFavoritesData with the updated data
-                            cachedFavoritesData[it] = updatedData ?: emptyList()
-
-                            /*val currentChartDataa = updatedData?.map { coinApiResultItem ->
-                                CoinAPIResultItem(
-                                    coinApiResultItem.price_close,
-                                    coinApiResultItem.price_high,
-                                    coinApiResultItem.price_low,
-                                    coinApiResultItem.price_open,
-                                    coinApiResultItem.time_close,
-                                    coinApiResultItem.time_open,
-                                    coinApiResultItem.time_period_end,
-                                    coinApiResultItem.time_period_start,
-                                    coinApiResultItem.trades_count,
-                                    coinApiResultItem.volume_traded,
-                                    coinApiResultItem.sma
-                                )
-                            } ?: emptyList()
-
-                            _loadError.value = ""
-                            _isLoading.value = false
-                            _currentChartData.value = currentChartDataa
-                            _currentChartName.value = symbol*/
+                            cachedFavoritesData[symbol] = updatedData ?: emptyList()
+                            symbolsProcessed++
                         }
                         is Resource.Error -> {
-                            Log.d(TAG, "GOT HERE - ERROR")
-                            //_loadError.value = result.message ?: ""
-                            //_isLoading.value = false
-                            //_currentChartName.value = ""
+                            // Handle error
+                            symbolsProcessed++
                         }
-                        else -> {}
+                        else -> {
+                            // Handle other states if necessary
+                            //symbolsProcessed++
+                        }
                     }
-                    delay(100)
+                    delay(200) // Optional delay between API calls
                 } else {
-                    //Log.d(TAG, "${cachedFavoritesData[it].toString()}")
+                    // Cached data exists, no need to fetch
+                    symbolsProcessed++
                 }
-
             }
-            //printFavoritesData()
+            // Check if all symbols have been processed
+            if (symbolsProcessed + 1 >= _savedList.value.size) {
+                // Set _isInitialized to true after all symbols are processed
+                _isInitialized.value = true
+            }
         }
     }
 

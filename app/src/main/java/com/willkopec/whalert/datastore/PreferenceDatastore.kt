@@ -14,16 +14,17 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+private val Context.dataStore : DataStore<Preferences> by preferencesDataStore("settings")
 class PreferenceDatastore @Inject constructor(@ApplicationContext context : Context) {
 
-    val Context.dataStore : DataStore<Preferences> by preferencesDataStore("settings")
-    var pref = context.dataStore
 
-    companion object {
-        var darkMode = booleanPreferencesKey("DARK_MODE")
-        var currentSymbol = stringPreferencesKey("CURRENT_SYMBOL")
-        var favoritesList = stringSetPreferencesKey("FAVORITES_LIST")
-    }
+    var pref = context.dataStore
+    private val darkMode =
+        booleanPreferencesKey("DARK_MODE")
+    private val currentSymbol =
+        stringPreferencesKey("CURRENT_SYMBOL")
+    private val favoritesList =
+        stringSetPreferencesKey("FAVORITES_LIST")
 
     suspend fun setDarkMode(value: Boolean){
         pref.edit {

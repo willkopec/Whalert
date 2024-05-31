@@ -33,7 +33,8 @@ fun HomeNavGraph(
     navController: NavHostController,
     bottomBarHeight: Int,
     webView: WebView,
-    viewModel: WhalertViewModel
+    viewModel: WhalertViewModel,
+    darkMode: Boolean
     ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -47,7 +48,7 @@ fun HomeNavGraph(
             DraggableBubbleScreen(bottomBarHeight = bottomBarHeight, viewModel = viewModel)
         }
         composable(route = BottomBarScreen.ChartsScreen.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight)
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, darkMode = darkMode)
         }
         composable(
             route = "${BottomBarScreen.ChartsScreen.route}/{indicator}",
@@ -56,7 +57,7 @@ fun HomeNavGraph(
             val indicator = backStackEntry.arguments?.getString("indicator")
 
             if (indicator != null) {
-                ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator = indicator)
+                ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator = indicator, darkMode = darkMode)
             }
         }
         composable(route = BottomBarScreen.DashboardScreen.route) {
@@ -68,16 +69,16 @@ fun HomeNavGraph(
         }
 
         composable(route = DashboardNavigation.DcaSimulator.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="dca_simulator")
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="dca_simulator", darkMode = darkMode)
         }
         composable(route = DashboardNavigation.ToolsPage.route) {
             BreakingNewsListScreen(navController = navController)
         }
         composable(route = DashboardNavigation.FeedbackPage.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="feedback")
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="feedback", darkMode = darkMode)
         }
         composable(route = DashboardNavigation.AnalyticsPage.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="monthly_gains_chart")
+            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="monthly_gains_chart", darkMode = darkMode)
         }
 
         detailsNavGraph(navController = navController)

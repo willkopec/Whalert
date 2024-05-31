@@ -71,13 +71,14 @@ import kotlinx.coroutines.delay
 fun ChartSymbolScreen(
     timeScaleInDays: Int,
     bottomBarHeight: Int,
+    darkMode: Boolean,
     viewModel: WhalertViewModel = hiltViewModel(),
     currentIndicator: String? = null
 ) {
     val currentChartData by viewModel.currentChartData.collectAsState()
     val loadError by viewModel.loadError.collectAsState()
     val currentName by viewModel.currentChartName.observeAsState()
-    val darkTheme by viewModel.darkTheme.collectAsState()
+    //val darkTheme by viewModel.darkTheme.collectAsState()
 
     Log.d("ChartScreen", "$currentName ${loadError}")
 
@@ -101,14 +102,14 @@ fun ChartSymbolScreen(
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(16.dp)
             )
-            LightweightChart(name = currentName, viewModel = viewModel, darkTheme = darkTheme)
+            LightweightChart(name = currentName, viewModel = viewModel, darkTheme = darkMode)
             // Other UI elements...
         }
     } else {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            IndicatorsChart(name = currentIndicator, darkTheme = darkTheme)
+            IndicatorsChart(name = currentIndicator, darkTheme = darkMode)
         }
     }
 

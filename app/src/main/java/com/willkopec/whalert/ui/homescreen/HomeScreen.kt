@@ -84,7 +84,7 @@ data class BottomNavigationItem(
 fun HomeScreen(
     webView: WebView,
     navController: NavHostController = rememberNavController(),
-    viewModel: WhalertViewModel = hiltViewModel()
+    viewModel: WhalertViewModel
 ) {
     val bottomBarHeightPx = with(LocalDensity.current) { 56.dp.toPx() } // Convert dp to pixels
 
@@ -101,6 +101,7 @@ fun HomeScreen(
                         titleContentColor = MaterialTheme.colorScheme.primary,
                     ),
                     title = { Text(text = APP_NAME) },
+                    /*navigationIcon = {Text(text = "Test")},*/
                     actions = {
                         ThemeSwitcher(
                             darkTheme = darkTheme,
@@ -131,7 +132,8 @@ fun HomeScreen(
                     navController = navController,
                     bottomBarHeight = bottomBarHeightPx.toInt(), // Pass the height in pixels
                     webView = webView,
-                    viewModel = viewModel
+                    viewModel = viewModel,
+                    darkMode = darkTheme
                 )
             }
         }

@@ -1,6 +1,7 @@
 package com.willkopec.whalert.di
 
 import android.content.Context
+import androidx.lifecycle.ViewModelProvider
 import com.willkopec.whalert.api.RetrofitInstance
 import com.willkopec.whalert.api.RetrofitQualifiers
 import com.willkopec.whalert.datastore.PreferenceDatastore
@@ -11,6 +12,7 @@ import com.willkopec.whalert.util.Constants.Companion.POLYGON_BASE_URL
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton

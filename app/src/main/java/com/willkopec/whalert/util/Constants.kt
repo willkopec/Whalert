@@ -9,6 +9,6 @@ class Constants {
 
         const val POLYGON_API = "p7c8V21Cyw6jFzkxVm6DjVuaromXeTpo"
         const val QUERY_PAGE_SIZE = 20
-        const val APP_NAME = "Whalert"
+        const val APP_NAME = "CryptoVizion"
     }
 }
