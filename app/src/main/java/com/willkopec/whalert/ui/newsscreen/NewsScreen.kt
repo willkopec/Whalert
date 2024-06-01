@@ -95,7 +95,7 @@ fun NewsArticleEntry(
                 /*.padding(13.dp)*/
                 .clickable {
                     val encodedUrl = URLEncoder.encode(currentArticle, "utf-8")
-                    navController.navigate("saved_news/$encodedUrl")
+                    navController.navigate("news/$encodedUrl")
                 }
         ) {
             Row(

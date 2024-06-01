@@ -23,7 +23,7 @@ sealed class DashboardNavigation(
         route = "analytics",
         icon = R.drawable.baseline_query_stats_24
     )
-    object ToolsPage : DashboardNavigation(
+    object NewsPage : DashboardNavigation(
         title = "News",
         route = "news",
         icon = R.drawable.baseline_newspaper_24

@@ -12,11 +12,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import com.squareup.moshi.Moshi
 import com.willkopec.whalert.Graph
 import com.willkopec.whalert.breakingnews.WhalertViewModel
+import com.willkopec.whalert.model.newsAPI.Article
 import com.willkopec.whalert.ui.chartscreen.ChartSymbolScreen
 import com.willkopec.whalert.ui.favoriteslistscreen.FavoritesListScreen
 import com.willkopec.whalert.ui.indicatorslistscreen.IndicatorsListScreenn
+import com.willkopec.whalert.ui.newsscreen.ArticleScreen
 import com.willkopec.whalert.ui.newsscreen.BreakingNewsListScreen
 import com.willkopec.whalert.util.BottomBarScreen
 import com.willkopec.whalert.util.DashboardNavigation
@@ -71,8 +74,21 @@ fun HomeNavGraph(
         composable(route = DashboardNavigation.DcaSimulator.route) {
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="dca_simulator", darkMode = darkMode)
         }
-        composable(route = DashboardNavigation.ToolsPage.route) {
+        composable(route = DashboardNavigation.NewsPage.route) {
             BreakingNewsListScreen(navController = navController)
+        }
+        composable(route = "${DashboardNavigation.NewsPage.route}/{article}") { backStackEntry ->
+            val articleJson = backStackEntry.arguments?.getString("article")
+            val moshi = Moshi.Builder().build()
+            val jsonAdapter = moshi.adapter(Article::class.java).lenient()
+            val currentArticle = jsonAdapter.fromJson(articleJson)
+
+            // WebViewScreen(url = "https://www.google.com")
+            if (currentArticle != null) {
+                ArticleScreen(currentArticle)
+            }
+
+            detailsNavGraph(navController = navController)
         }
         composable(route = DashboardNavigation.FeedbackPage.route) {
             ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="feedback", darkMode = darkMode)
