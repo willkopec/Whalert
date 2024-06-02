@@ -2,7 +2,7 @@
 #### The crypto app for Bubble charts, charts and technical analysis of Bitcoin and other cryptos!
 
 ##### This application is still under developement and constantly being updated! It is currently under review for closed testing on the Google Play Store and will be released in roughly ~ 1 month. 
-##### Interested in becoming a tester? Join my Google Group here: https://groups.google.com/g/cryptovizion - Testing will be available within the next few days!
+##### Interested in becoming a tester? Join my Google Group here: https://groups.google.com/g/cryptovizion and visit this joinable Closed Test link here: https://play.google.com/apps/testing/com.willkopec.whalert
 
 #### Features:
 ###### ----------------------
