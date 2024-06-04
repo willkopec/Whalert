@@ -294,10 +294,7 @@ fun IndicatorRows(
                         .weight(1f)
                         .align(Alignment.CenterVertically)
                         .clickable {
-                            navController.navigate(entry.route) {
-                                popUpTo(navController.graph.findStartDestination().id)
-                                launchSingleTop = true
-                            }
+                            navController.navigate(entry.route)
                             Log.d("NAVIGATION", "${entry.route}")
                         }
                 ) {

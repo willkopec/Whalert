@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.datastore.PreferenceDatastore
+import com.willkopec.whalert.ui.homescreen.HomeNavGraph
 import com.willkopec.whalert.ui.homescreen.HomeScreen
+import com.willkopec.whalert.ui.homescreen.ScreenContent
+import com.willkopec.whalert.ui.theme.WhalertTheme
 import com.willkopec.whalert.util.Constants.Companion.APP_NAME
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -58,20 +62,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         webView = WebView(this)
 
+        val darkTheme = viewModel.darkTheme.value
 
         setContent {
-            val navController = rememberNavController() // Remember the navController
             //val viewModel: WhalertViewModel = viewModel(factory = viewModelFactory)
-            SplashScreen(navController = navController, viewModel = viewModel, webView = webView) {
-                // Callback function to navigate to RootNavigationGraph
-                //RootNavigationGraph()
-                //navigateToRoot(navController)
+            WhalertTheme(darkTheme = darkTheme) {
+                SplashScreen(navController = rememberNavController(), viewModel = viewModel, webView = webView) {
+                    // Callback function to navigate to RootNavigationGraph
+                    //RootNavigationGraph()
+                    //navigateToRoot(navController)
+                }
             }
-        }
-    }
 
-    private fun navigateToRoot(navController: NavHostController) {
-        navController.navigate(Graph.HOME)
+        }
     }
 }
 
@@ -83,6 +86,7 @@ fun SplashScreen(
     onInitializationComplete: () -> Unit
 ) {
     val isInitialized by viewModel.isInitialized.collectAsState()
+    val darkTheme by viewModel.darkTheme.collectAsState()
 
     Box(
         modifier = Modifier
@@ -92,7 +96,10 @@ fun SplashScreen(
     ) {
         if (isInitialized) {
             // Data is initialized, show the main UI
-            RootNavigationGraph(navController = navController, webView = webView, viewModel = viewModel)
+            WhalertTheme(darkTheme = darkTheme) {
+                HomeNavGraph(navController = navController, webView = webView, viewModel = viewModel, darkMode = darkTheme, bottomBarHeight = with(LocalDensity.current) { 56.dp.toPx() }.toInt())
+            }
+
             onInitializationComplete()
         } else {
             // Data is not yet initialized, show a loading indicator or placeholder UI
@@ -112,23 +119,6 @@ fun SplashScreen(
                 Spacer(modifier = Modifier.height(20.dp))
                 CircularProgressIndicator()
             }
-        }
-    }
-}
-
-@Composable
-fun RootNavigationGraph(
-    navController: NavHostController,
-    webView: WebView,
-    viewModel: WhalertViewModel
-    ) {
-    NavHost(
-        navController = navController,
-        route = Graph.ROOT,
-        startDestination = Graph.HOME
-    ) {
-        composable(route = Graph.HOME) {
-            HomeScreen(webView, viewModel = viewModel)
         }
     }
 }

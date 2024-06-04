@@ -5,6 +5,8 @@ import android.webkit.WebView
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -48,11 +50,22 @@ fun HomeNavGraph(
         startDestination = BottomBarScreen.BubbleCharts.route
     ) {
         composable(route = BottomBarScreen.BubbleCharts.route) {
-            DraggableBubbleScreen(bottomBarHeight = bottomBarHeight, viewModel = viewModel)
+            HomeScreen(webView, viewModel = viewModel, navController = navController,
+                currentFragmentScreen = { DraggableBubbleScreen() }
+            )
         }
         composable(route = BottomBarScreen.ChartsScreen.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, darkMode = darkMode)
+            HomeScreen(webView, viewModel = viewModel, navController = navController,
+                currentFragmentScreen = { ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, darkMode = darkMode) }
+            )
         }
+        composable(route = BottomBarScreen.DashboardScreen.route) {
+            HomeScreen(webView, viewModel = viewModel, navController = navController,
+                currentFragmentScreen = { FavoritesListScreen(navController) }
+            )
+
+        }
+
         composable(
             route = "${BottomBarScreen.ChartsScreen.route}/{indicator}",
             arguments = listOf(navArgument("indicator") { type = NavType.StringType })
@@ -60,22 +73,21 @@ fun HomeNavGraph(
             val indicator = backStackEntry.arguments?.getString("indicator")
 
             if (indicator != null) {
-                ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator = indicator, darkMode = darkMode)
+                HomeScreen(webView, viewModel = viewModel, navController = navController,
+                    currentFragmentScreen = { ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator = indicator, darkMode = darkMode) }
+                )
             }
-        }
-        composable(route = BottomBarScreen.DashboardScreen.route) {
-            FavoritesListScreen(navController)
         }
 
         composable(route = DashboardNavigation.IndicatorsPage.route) {
-            IndicatorsListScreenn(navController=navController)
+            HomeScreen(webView, viewModel = viewModel, navController = navController, currentFragmentScreen = { IndicatorsListScreenn(navController=navController) })
         }
 
         composable(route = DashboardNavigation.DcaSimulator.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="dca_simulator", darkMode = darkMode)
+            HomeScreen(webView, viewModel = viewModel, navController = navController, currentFragmentScreen = {  ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="dca_simulator", darkMode = darkMode) })
         }
         composable(route = DashboardNavigation.NewsPage.route) {
-            BreakingNewsListScreen(navController = navController)
+            HomeScreen(webView, viewModel = viewModel, navController = navController, currentFragmentScreen = { BreakingNewsListScreen(navController = navController)})
         }
         composable(route = "${DashboardNavigation.NewsPage.route}/{article}") { backStackEntry ->
             val articleJson = backStackEntry.arguments?.getString("article")
@@ -85,16 +97,16 @@ fun HomeNavGraph(
 
             // WebViewScreen(url = "https://www.google.com")
             if (currentArticle != null) {
-                ArticleScreen(currentArticle)
+                HomeScreen(webView, viewModel = viewModel, navController = navController, currentFragmentScreen = { ArticleScreen(currentArticle) } )
             }
 
             detailsNavGraph(navController = navController)
         }
         composable(route = DashboardNavigation.FeedbackPage.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="feedback", darkMode = darkMode)
+            HomeScreen(webView, viewModel = viewModel, navController = navController, currentFragmentScreen = { ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="feedback", darkMode = darkMode) })
         }
         composable(route = DashboardNavigation.AnalyticsPage.route) {
-            ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="monthly_gains_chart", darkMode = darkMode)
+            HomeScreen(webView, viewModel = viewModel, navController = navController, currentFragmentScreen = { ChartSymbolScreen(timeScaleInDays = 100, bottomBarHeight = bottomBarHeight, currentIndicator="monthly_gains_chart", darkMode = darkMode) })
         }
 
         detailsNavGraph(navController = navController)

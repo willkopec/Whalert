@@ -32,11 +32,11 @@ import kotlin.math.roundToInt
 
 @Composable
 fun DraggableBubbleScreen(
-    viewModel: WhalertViewModel = hiltViewModel(),
-    bottomBarHeight: Int
+    viewModel: WhalertViewModel = hiltViewModel()
 ) {
     val density = LocalDensity.current
-    val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }
+    val screenWidth = with(density) { LocalConfiguration.current.screenWidthDp.dp.toPx() }.toInt()
+    val bottomBarHeight = with(LocalDensity.current) { 56.dp.toPx() }.toInt()
     val currentCryptoBubbleList by viewModel.bubbleList.collectAsState()
     var item: Int = 0
 

@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Nightlight
 import androidx.compose.material3.Badge
@@ -32,6 +33,7 @@ import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -68,7 +70,9 @@ import com.willkopec.whalert.R
 import com.willkopec.whalert.breakingnews.WhalertViewModel
 import com.willkopec.whalert.ui.theme.WhalertTheme
 import com.willkopec.whalert.util.BottomBarScreen
+import com.willkopec.whalert.util.ChartHtmlContentUtil
 import com.willkopec.whalert.util.Constants.Companion.APP_NAME
+import com.willkopec.whalert.util.DashboardNavigation
 
 data class BottomNavigationItem(
     val title: String,
@@ -78,13 +82,21 @@ data class BottomNavigationItem(
     val badgeCount: Int? = null
 )
 
+val screens =
+    listOf(
+        BottomBarScreen.BubbleCharts,
+        BottomBarScreen.ChartsScreen,
+        BottomBarScreen.DashboardScreen,
+    )
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun HomeScreen(
     webView: WebView,
     navController: NavHostController = rememberNavController(),
-    viewModel: WhalertViewModel
+    viewModel: WhalertViewModel,
+    currentFragmentScreen: @Composable () -> Unit
 ) {
     val bottomBarHeightPx = with(LocalDensity.current) { 56.dp.toPx() } // Convert dp to pixels
 
@@ -92,28 +104,17 @@ fun HomeScreen(
     val loadError by viewModel.loadError.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    WhalertTheme(darkTheme = darkTheme) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
         Scaffold(
             topBar = {
-                TopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    title = { Text(text = APP_NAME) },
-                    /*navigationIcon = {Text(text = "Test")},*/
-                    actions = {
-                        ThemeSwitcher(
-                            darkTheme = darkTheme,
-                            size = 50.dp,
-                            padding = 5.dp,
-                            onClick = {
-                                viewModel.switchDarkMode()
-                                //viewModel.printList()
-                            }
-                        )
-                    }
-                )
+                val bottomBarDestination = screens.any { it.route == currentDestination?.route }
+                if (bottomBarDestination) {
+                    DefaultTopBar(darkTheme = darkTheme, viewModel = viewModel)
+                } else {
+                    BackButtonTopBar(navController = navController)
+                }
             },
             bottomBar = {
                 BottomNavigation(navController = navController)
@@ -128,16 +129,74 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 // Adjust the padding to accommodate the bottom navigation bar
-                HomeNavGraph(
+                currentFragmentScreen()
+                /*HomeNavGraph(
                     navController = navController,
                     bottomBarHeight = bottomBarHeightPx.toInt(), // Pass the height in pixels
                     webView = webView,
                     viewModel = viewModel,
                     darkMode = darkTheme
-                )
+                )*/
             }
         }
-    }
+}
+
+@SuppressLint("RestrictedApi")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BackButtonTopBar(navController: NavHostController) {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
+                )
+            }
+        },
+        title = {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+            var currentTitle = currentDestination?.route.toString()
+            when(currentDestination?.route){
+                DashboardNavigation.IndicatorsPage.route -> currentTitle = "Indicators"
+                DashboardNavigation.DcaSimulator.route -> currentTitle = "DCA Simulator"
+                DashboardNavigation.AnalyticsPage.route -> currentTitle = "BTC Monthly Gains"
+                DashboardNavigation.NewsPage.route -> currentTitle = "Crypto News"
+                DashboardNavigation.FeedbackPage.route -> currentTitle = "Feedback/Reports"
+                //Indicators:
+                "${BottomBarScreen.ChartsScreen.route}/{indicator}" -> currentTitle = "Indicator"
+            }
+            Text(text = currentTitle)
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DefaultTopBar(darkTheme: Boolean, viewModel: WhalertViewModel){
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.primary,
+        ),
+        title = { Text(text = APP_NAME) },
+        actions = {
+            ThemeSwitcher(
+                darkTheme = darkTheme,
+                size = 50.dp,
+                padding = 5.dp,
+                onClick = {
+                    viewModel.switchDarkMode()
+                    //viewModel.printList()
+                }
+            )
+        }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -166,20 +225,13 @@ fun BottomNavigation(navController: NavHostController) {
             ),
         )
 
-    val screens =
-        listOf(
-            BottomBarScreen.BubbleCharts,
-            BottomBarScreen.ChartsScreen,
-            BottomBarScreen.DashboardScreen,
-        )
-
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    //val bottomBarDestination = screens.any { it.route == currentDestination?.route }
-    //if (bottomBarDestination) {
+    val bottomBarDestination = screens.any { it.route == currentDestination?.route }
+    if (bottomBarDestination) {
         NavigationBar {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
@@ -188,10 +240,7 @@ fun BottomNavigation(navController: NavHostController) {
                     currentDestination?.hierarchy?.any { it.route == screens[index].route } ==
                             true,
                     onClick = {
-                        navController.navigate(screens[index].route) {
-                            popUpTo(navController.graph.findStartDestination().id)
-                            launchSingleTop = true
-                        }
+                        navController.navigate(screens[index].route)
                     },
                     label = { Text(text = item.title) },
                     icon = {
@@ -216,7 +265,7 @@ fun BottomNavigation(navController: NavHostController) {
                 )
             }
         }
-    //}
+    }
 }
 
 @Composable

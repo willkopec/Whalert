@@ -126,10 +126,7 @@ fun IndicatorListItem(
             .fillMaxWidth()
             .shadow(1.dp, RoundedCornerShape(1.dp))
             .clickable {
-                navController.navigate("${BottomBarScreen.ChartsScreen.route}/${indicatorData.indicatorID}") {
-                    popUpTo(navController.graph.findStartDestination().id)
-                    launchSingleTop = true
-                }
+                navController.navigate("${BottomBarScreen.ChartsScreen.route}/${indicatorData.indicatorID}")
             }
     ) {
         Row(

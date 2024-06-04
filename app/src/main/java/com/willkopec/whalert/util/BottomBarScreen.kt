@@ -18,8 +18,8 @@ sealed class BottomBarScreen(
     )
 
     object ChartsScreen : BottomBarScreen(
-        route = "profile",
-        title = "Profile",
+        route = "charts",
+        title = "Charts",
         icon = Icons.Default.Person
     )
 
