@@ -61,7 +61,7 @@ fun HomeNavGraph(
         }
         composable(route = BottomBarScreen.DashboardScreen.route) {
             HomeScreen(webView, viewModel = viewModel, navController = navController,
-                currentFragmentScreen = { FavoritesListScreen(navController) }
+                currentFragmentScreen = { FavoritesListScreen(navController, darkMode) }
             )
 
         }

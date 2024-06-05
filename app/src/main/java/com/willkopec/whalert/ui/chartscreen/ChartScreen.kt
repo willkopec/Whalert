@@ -96,7 +96,7 @@ fun ChartSymbolScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             SearchBar(
-                hint = "Search...",
+                hint = "Search Symbol (Example: ETH)",
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.primaryContainer)
@@ -194,7 +194,7 @@ fun SearchBar(
         mutableStateOf("")
     }
     var isHintDisplayed by remember {
-        mutableStateOf(hint != "")
+        mutableStateOf(hint == "")
     }
 
     Box(modifier = modifier){
@@ -214,7 +214,7 @@ fun SearchBar(
                 .background(Color.White, CircleShape)
                 .padding(horizontal = 20.dp, vertical = 12.dp)
                 .onFocusChanged {
-                    isHintDisplayed = !it.isFocused && text.isNotEmpty()
+                    isHintDisplayed = !it.isFocused && text.isEmpty()
                 }
         )
         if(isHintDisplayed) {

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -48,6 +49,7 @@ import com.willkopec.whalert.util.DashboardNavigation
 @Composable
 fun FavoritesListScreen(
     navController: NavHostController,
+    darkMode: Boolean,
     viewModel: WhalertViewModel = hiltViewModel()
 ) {
 
@@ -81,7 +83,8 @@ fun FavoritesListScreen(
                         cryptoInfo,
                         indicatorData = indicatorData,
                         modifier = Modifier,
-                        viewModel = viewModel
+                        viewModel = viewModel,
+                        darkMode = darkMode
                     )
                 }
             }
@@ -96,6 +99,7 @@ fun FavoritesListItem(
     cryptoInfo: CryptoItem?,
     indicatorData: List<CoinAPIResultItem>?,
     modifier: Modifier = Modifier,
+    darkMode: Boolean,
     viewModel: WhalertViewModel = hiltViewModel()
 ) {
 
@@ -155,6 +159,10 @@ fun FavoritesListItem(
             Row(
                 modifier=modifier.padding(end = 16.dp)
             ){
+                var viewColor: Color = Color.Black
+                if(darkMode){
+                    viewColor = Color.LightGray
+                }
                 Image(
                     painter = painterResource(R.drawable.baseline_remove_red_eye_24),
                     contentDescription = "Content description for visually impaired",
@@ -164,7 +172,8 @@ fun FavoritesListItem(
                         /*.padding(end = 16.dp) // Add horizontal padding*/
                         .clickable {
                             viewModel.updateSymbolAndNavigate(symbol, navController)
-                        }
+                        },
+                    colorFilter = ColorFilter.tint(viewColor) // Change the color here
                 )
             }
 
