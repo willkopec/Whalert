@@ -273,12 +273,12 @@ chart.subscribeCrosshairMove(param => {
     .buttons-container button {
         all: initial;
         font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
-        font-size: 14px;
+        font-size: 13px;
         font-style: normal;
-        font-weight: 510;
+        font-weight: bold;
         line-height: 24px; /* 150% */
         letter-spacing: -0.32px;
-        padding: 8px 24px;
+        padding: 5px 14px;
         color: rgba(19, 23, 34, 1);
         background-color: rgba(240, 243, 250, 1);
         border-radius: 8px;
@@ -309,7 +309,7 @@ chart.subscribeCrosshairMove(param => {
         font-weight: 510;
         line-height: 10px; /* 150% */
         letter-spacing: -0.32px;
-        padding: 8px 10px;
+        padding: 6px 12px;
         color: rgba(19, 23, 34, 1);
         background-color: rgba(240, 243, 250, 1);
         border-radius: 8px;
@@ -335,8 +335,6 @@ chart.subscribeCrosshairMove(param => {
     <div id="chartContainer">
         <!-- Buttons container -->
         <div class="buttons-container">
-            <!-- Button to scroll to real-time -->
-            <button id="realtimeButton">Go to realtime</button>
             <!-- Button to add to favorites -->
             <button id="addToFavoritesButton">Add to Favorites</button>
         </div>
@@ -366,9 +364,6 @@ chart.subscribeCrosshairMove(param => {
 
 // Initialize the chart with the default height
 setChartContainerHeight();
-
-// Add event listener to recalculate height when the window is resized
-window.addEventListener('resize', setChartContainerHeight);
 
 // Initialize the chart
 const chartOptions = {
@@ -407,7 +402,8 @@ let currentInterval = '1DAY'; // Default interval
             convertToCoinAPIFormat(
                 it
             )
-        }}/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}`);
+        }}/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
+			`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -430,11 +426,6 @@ let currentInterval = '1DAY'; // Default interval
         series.setData(candleData);
     }
 
-    // Function to scroll to real-time data
-    function scrollToRealTime() {
-        chart.timeScale().scrollToRealTime();
-    }
-
     function addToOrDeleteFromFavorites() {
         // Invoke the isInFavorites method of the JavaScript interface
         if (Android.isInFavorites("$symbol")) {
@@ -449,10 +440,6 @@ let currentInterval = '1DAY'; // Default interval
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
     setInterval(fetchDataAndUpdateChart, 5000);
-
-    // Add event listener to the real-time button
-    const realtimeButton = document.getElementById('realtimeButton');
-    realtimeButton.addEventListener('click', scrollToRealTime);
 
     const addToFavoritesButton = document.getElementById('addToFavoritesButton');
     addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
@@ -506,7 +493,7 @@ let currentInterval = '1DAY'; // Default interval
     fun getDarkModeBarChartHtmlContent(symbol: String?, days: Int): String{
         return """
         <html>
-<head>
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
     <title>Real-time Chart Example</title>
@@ -542,12 +529,12 @@ let currentInterval = '1DAY'; // Default interval
     .buttons-container button {
         all: initial;
         font-family: -apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif;
-        font-size: 14px;
+        font-size: 13px;
         font-style: normal;
-        font-weight: 510;
+        font-weight: bold;
         line-height: 24px; /* 150% */
         letter-spacing: -0.32px;
-        padding: 8px 24px;
+        padding: 5px 14px;
         color: rgba(19, 23, 34, 1);
         background-color: rgba(240, 243, 250, 1);
         border-radius: 8px;
@@ -578,7 +565,7 @@ let currentInterval = '1DAY'; // Default interval
         font-weight: 510;
         line-height: 10px; /* 150% */
         letter-spacing: -0.32px;
-        padding: 8px 10px;
+        padding: 6px 12px;
         color: rgba(19, 23, 34, 1);
         background-color: rgba(240, 243, 250, 1);
         border-radius: 8px;
@@ -604,8 +591,6 @@ let currentInterval = '1DAY'; // Default interval
     <div id="chartContainer">
         <!-- Buttons container -->
         <div class="buttons-container">
-            <!-- Button to scroll to real-time -->
-            <button id="realtimeButton">Go to realtime</button>
             <!-- Button to add to favorites -->
             <button id="addToFavoritesButton">Add to Favorites</button>
         </div>
@@ -635,9 +620,6 @@ let currentInterval = '1DAY'; // Default interval
 
 // Initialize the chart with the default height
 setChartContainerHeight();
-
-// Add event listener to recalculate height when the window is resized
-window.addEventListener('resize', setChartContainerHeight);
 
 // Initialize the chart
 const chartOptions = {
@@ -676,7 +658,8 @@ let currentInterval = '1DAY'; // Default interval
             convertToCoinAPIFormat(
                 it
             )
-        }}/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}`);
+        }}/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
+			`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -699,11 +682,6 @@ let currentInterval = '1DAY'; // Default interval
         series.setData(candleData);
     }
 
-    // Function to scroll to real-time data
-    function scrollToRealTime() {
-        chart.timeScale().scrollToRealTime();
-    }
-
     function addToOrDeleteFromFavorites() {
         // Invoke the isInFavorites method of the JavaScript interface
         if (Android.isInFavorites("$symbol")) {
@@ -718,10 +696,6 @@ let currentInterval = '1DAY'; // Default interval
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
     setInterval(fetchDataAndUpdateChart, 5000);
-
-    // Add event listener to the real-time button
-    const realtimeButton = document.getElementById('realtimeButton');
-    realtimeButton.addEventListener('click', scrollToRealTime);
 
     const addToFavoritesButton = document.getElementById('addToFavoritesButton');
     addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);

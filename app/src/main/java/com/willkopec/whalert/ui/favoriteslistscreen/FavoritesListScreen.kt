@@ -161,7 +161,7 @@ fun FavoritesListItem(
             ){
                 var viewColor: Color = Color.Black
                 if(darkMode){
-                    viewColor = Color.LightGray
+                    viewColor = Color.Gray
                 }
                 Image(
                     painter = painterResource(R.drawable.baseline_remove_red_eye_24),

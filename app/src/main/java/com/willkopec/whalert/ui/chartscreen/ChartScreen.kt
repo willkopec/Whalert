@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -193,9 +194,12 @@ fun SearchBar(
     var text by remember {
         mutableStateOf("")
     }
+
     var isHintDisplayed by remember {
         mutableStateOf(hint == "")
     }
+
+    val controller = LocalSoftwareKeyboardController.current
 
     Box(modifier = modifier){
 
@@ -220,7 +224,7 @@ fun SearchBar(
         if(isHintDisplayed) {
             Text(
                 text = hint,
-                color = Color.LightGray,
+                color = Color.DarkGray,
                 modifier = Modifier
                     .padding(horizontal = 20.dp, vertical = 12.dp)
             )
@@ -230,7 +234,9 @@ fun SearchBar(
 
     LaunchedEffect(key1 = text) {
         if (text.isBlank()) return@LaunchedEffect
-        delay(2400)
+        delay(2150)
+        controller?.hide()
+        delay(100)
         viewModel.getSymbolData(text)
         //viewModel.printList()
     }

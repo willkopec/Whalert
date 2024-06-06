@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LightMode
@@ -60,17 +59,13 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.willkopec.whalert.R
 import com.willkopec.whalert.breakingnews.WhalertViewModel
-import com.willkopec.whalert.ui.theme.WhalertTheme
 import com.willkopec.whalert.util.BottomBarScreen
-import com.willkopec.whalert.util.ChartHtmlContentUtil
 import com.willkopec.whalert.util.Constants.Companion.APP_NAME
 import com.willkopec.whalert.util.DashboardNavigation
 
@@ -82,15 +77,22 @@ data class BottomNavigationItem(
     val badgeCount: Int? = null
 )
 
-val screens =
+val homeScreens =
     listOf(
         BottomBarScreen.BubbleCharts,
         BottomBarScreen.ChartsScreen,
         BottomBarScreen.DashboardScreen,
     )
 
+val screensWithTopBar =
+    listOf(
+        BottomBarScreen.BubbleCharts,
+        /*BottomBarScreen.ChartsScreen,*/
+        BottomBarScreen.DashboardScreen,
+    )
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "SuspiciousIndentation")
 @Composable
 fun HomeScreen(
     webView: WebView,
@@ -109,10 +111,10 @@ fun HomeScreen(
 
         Scaffold(
             topBar = {
-                val bottomBarDestination = screens.any { it.route == currentDestination?.route }
-                if (bottomBarDestination) {
+                val isABottomNavScreen = screensWithTopBar.any { it.route == currentDestination?.route }
+                if (isABottomNavScreen) {
                     DefaultTopBar(darkTheme = darkTheme, viewModel = viewModel)
-                } else {
+                } else if(currentDestination?.route != BottomBarScreen.ChartsScreen.route){
                     BackButtonTopBar(navController = navController)
                 }
             },
@@ -163,6 +165,10 @@ fun BackButtonTopBar(navController: NavHostController) {
             val currentDestination = navBackStackEntry?.destination
             var currentTitle = currentDestination?.route.toString()
             when(currentDestination?.route){
+                //base cases
+                null -> currentTitle = ""
+                "null" -> currentTitle = ""
+                //Dashboard Navigation screens
                 DashboardNavigation.IndicatorsPage.route -> currentTitle = "Indicators"
                 DashboardNavigation.DcaSimulator.route -> currentTitle = "DCA Simulator"
                 DashboardNavigation.AnalyticsPage.route -> currentTitle = "BTC Monthly Gains"
@@ -230,17 +236,17 @@ fun BottomNavigation(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    val bottomBarDestination = screens.any { it.route == currentDestination?.route }
+    val bottomBarDestination = homeScreens.any { it.route == currentDestination?.route }
     if (bottomBarDestination) {
         NavigationBar {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     /*selected = selectedItemIndex == index,*/
                     selected =
-                    currentDestination?.hierarchy?.any { it.route == screens[index].route } ==
+                    currentDestination?.hierarchy?.any { it.route == homeScreens[index].route } ==
                             true,
                     onClick = {
-                        navController.navigate(screens[index].route)
+                        navController.navigate(homeScreens[index].route)
                     },
                     label = { Text(text = item.title) },
                     icon = {
