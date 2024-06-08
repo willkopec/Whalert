@@ -28,30 +28,33 @@
 ##### - ETF In/out flows page
 
 ### Images:
-![whalert screen1](https://github.com/willkopec/Whalert/assets/85149000/a87829f3-14c6-447d-af7d-0fc9ecda6699)
-![whalert screen2](https://github.com/willkopec/Whalert/assets/85149000/698e8e43-a075-4171-b2ac-459924148d84)
-![whalert screen3](https://github.com/willkopec/Whalert/assets/85149000/91ac7dcc-51b4-48a3-a2fc-8a1def286e9b)
-![indicators list screen](https://github.com/willkopec/Whalert/assets/85149000/2d8e070f-2120-4b26-9837-7e57980010f2)
+![cryptovizion 1](https://github.com/willkopec/Whalert/assets/85149000/554b9e65-4a4e-4a6f-836c-71bbcb295ca2)
+![cryptovizion 2](https://github.com/willkopec/Whalert/assets/85149000/b50a23f6-9772-49f7-98a4-744143522894)
+![cryptovizion 2p2](https://github.com/willkopec/Whalert/assets/85149000/815d9f09-16bd-4e6d-a856-c9ebc06dec72)
+![cryptovizion 3](https://github.com/willkopec/Whalert/assets/85149000/2c539f5d-b673-467d-ad3e-24d95bc7059a)
+![cryptovizion indicator screen](https://github.com/willkopec/Whalert/assets/85149000/1c803596-8570-40b6-8558-0632a155c111)
 
 ##### Btc Pi cycle top:
-![whalert pi cycle](https://github.com/willkopec/Whalert/assets/85149000/2aad4778-5f2a-4873-b586-14e00c59fb65)
-![whalert pi cycle landscape](https://github.com/willkopec/Whalert/assets/85149000/8fc1fb09-c2a9-46f2-8c6b-dfe5d1677e3b)
+![cryptovizion pi cycle](https://github.com/willkopec/Whalert/assets/85149000/9d391906-7ed7-40c5-8698-bc0ad5ecc16f)
+
 ##### Btc Profitable Days:
-![whalert btc days profitable indicator](https://github.com/willkopec/Whalert/assets/85149000/a2937a3e-4e53-4497-b072-43badf900cf3)
-![whalert btc days profitable indicator landscape](https://github.com/willkopec/Whalert/assets/85149000/de55b70a-cccd-46e1-988a-45e2428308d5)
+![cryptovizion profitable days](https://github.com/willkopec/Whalert/assets/85149000/7dd989e4-573f-4e57-abf0-9889116cfb55)
+
 ##### Btc 2 Year MA Indicator:
-![whalert btc 2yma](https://github.com/willkopec/Whalert/assets/85149000/592a2433-fab1-4a5a-9c27-aebfa10d97b9)
-![whalert btc 2yma landscape](https://github.com/willkopec/Whalert/assets/85149000/05b2ca1d-759a-442b-ac0e-9383ae903736)
+![cryptovizion 2y ma](https://github.com/willkopec/Whalert/assets/85149000/335861fd-b8bc-4229-ad9b-93f3a1268f20)
+
 ##### Btc Puell Multiple Indicator:
-![whalert puell multiple](https://github.com/willkopec/Whalert/assets/85149000/54392ea0-d20a-43bc-924f-ea26c106a9c3)
-![whalert puell multiple landscape](https://github.com/willkopec/Whalert/assets/85149000/62ca4faa-c7bd-4dbf-9054-294a000872a9)
+![cryptovizion puell](https://github.com/willkopec/Whalert/assets/85149000/0a8ead48-36e1-40f7-821b-516f7be40d0f)
+
 ##### Btc DCA Simulator:
 ![whalert dca simulator](https://github.com/willkopec/Whalert/assets/85149000/31598919-545a-4b3a-b53d-c70f112827f4)
 ![whalert dca simulator landscape](https://github.com/willkopec/Whalert/assets/85149000/4a07d9f7-29d0-4d3b-b68b-6548dc916ad7)
+
 ##### Btc Monthly Gains:
-![whalert monthly performance](https://github.com/willkopec/Whalert/assets/85149000/f2c0d9d1-f412-47db-9fc8-95c5a14b51a5)
-![whalert monthly performance2](https://github.com/willkopec/Whalert/assets/85149000/d86cf1e0-6700-4a8f-aca1-5d803a0ff708)
+![cryptovizion Analytics](https://github.com/willkopec/Whalert/assets/85149000/7d33302f-bae8-4a4c-80b6-0491d83c17f2)
+
 ##### News screen:
-![whalert news screen](https://github.com/willkopec/Whalert/assets/85149000/b958f346-69d4-4f9f-a784-17d02b9a2639)
+![cryptovizion news](https://github.com/willkopec/Whalert/assets/85149000/12a641c6-b3c3-4cfe-b40d-28bcaf7cfd1a)
+
 ##### Feedback/Report/Suggestions page:
-![feedback screen](https://github.com/willkopec/Whalert/assets/85149000/7c525922-5c3e-4e1c-8da2-028ab6549fcb)
+![cryptovizion feedback](https://github.com/willkopec/Whalert/assets/85149000/6a0d0123-42da-430c-a12c-06f4482123f0)
