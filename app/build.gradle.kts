@@ -14,8 +14,8 @@ android {
         applicationId = "com.willkopec.whalert"
         minSdk = 26
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.2.1"
+        versionCode = 7
+        versionName = "1.2.31"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

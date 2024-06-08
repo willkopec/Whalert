@@ -402,7 +402,26 @@ let currentInterval = '1DAY'; // Default interval
             convertToCoinAPIFormat(
                 it
             )
-        }}/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
+        }}/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
+			`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data: ' + response.statusText);
+            }
+            const apiData = await response.json();
+            updateChartWithNewData(apiData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    
+    // Function to fetch data from the API endpoint
+    async function fetchData() {
+        try {
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/${symbol?.let {
+            convertToCoinAPIFormat(
+                it
+            )
+        }}/apikey-A5B83F88-B4B4-4D3E-91BF-6961B7BBC15C/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
 			`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
@@ -439,7 +458,7 @@ let currentInterval = '1DAY'; // Default interval
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    setInterval(fetchDataAndUpdateChart, 30000);
 
     const addToFavoritesButton = document.getElementById('addToFavoritesButton');
     addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
@@ -466,7 +485,7 @@ let currentInterval = '1DAY'; // Default interval
             currentInterval = '1MTH';
         }
         // Fetch data with the new interval
-        fetchDataAndUpdateChart();
+        fetchData();
         console.log('Chart interval set to: ' + interval);
     }
 
@@ -658,7 +677,26 @@ let currentInterval = '1DAY'; // Default interval
             convertToCoinAPIFormat(
                 it
             )
-        }}/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
+        }}/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
+			`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch data: ' + response.statusText);
+            }
+            const apiData = await response.json();
+            updateChartWithNewData(apiData);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    
+    // Function to fetch data from the API endpoint
+    async function fetchData() {
+        try {
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/${symbol?.let {
+            convertToCoinAPIFormat(
+                it
+            )
+        }}/apikey-A5B83F88-B4B4-4D3E-91BF-6961B7BBC15C/history?period_id=${'$'}{currentInterval}&time_start=${getDateBeforeDaysWithTime(days - 1)}&limit=${days}
 			`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
@@ -693,9 +731,9 @@ let currentInterval = '1DAY'; // Default interval
         }
     }
 
-    // Fetch data from the API and update the chart every 5 seconds
+    // Fetch data from the API and update the chart every 30 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    setInterval(fetchDataAndUpdateChart, 30000);
 
     const addToFavoritesButton = document.getElementById('addToFavoritesButton');
     addToFavoritesButton.addEventListener('click', addToOrDeleteFromFavorites);
@@ -722,7 +760,7 @@ let currentInterval = '1DAY'; // Default interval
             currentInterval = '1MTH';
         }
         // Fetch data with the new interval
-        fetchDataAndUpdateChart();
+        fetchData();
         console.log('Chart interval set to: ' + interval);
     }
 
@@ -912,7 +950,7 @@ let currentInterval = '1DAY'; // Default interval
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -994,7 +1032,7 @@ function updateChartWithNewData(newData) {
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -1184,7 +1222,7 @@ function updateChartWithNewData(newData) {
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -1266,7 +1304,7 @@ function updateChartWithNewData(newData) {
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -1467,7 +1505,7 @@ function updateChartWithNewData(newData) {
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -1529,7 +1567,7 @@ if (!ratioCalculated && winCount + loseCount > 0) {
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -1685,7 +1723,7 @@ if (!ratioCalculated && winCount + loseCount > 0) {
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2012-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -1747,7 +1785,7 @@ if (!ratioCalculated && winCount + loseCount > 0) {
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -1924,7 +1962,7 @@ const series = chart.addLineSeries();
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -2045,7 +2083,7 @@ const series = chart.addLineSeries();
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -2219,7 +2257,7 @@ const series = chart.addLineSeries();
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -2340,7 +2378,7 @@ const series = chart.addLineSeries();
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -2693,7 +2731,7 @@ const series = chart.addLineSeries();
 
         const totalDcaAmount = daysBetweenStartAndEnd * dcaAmountValue;
 
-        const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=${'$'}{startDateValue}T00:00:00&limit=${'$'}{daysBetweenStartAndEnd}`);
+        const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=${'$'}{startDateValue}T00:00:00&limit=${'$'}{daysBetweenStartAndEnd}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch data: ${'$'}{response.status} ${'$'}{response.statusText}`);
         }
@@ -2918,7 +2956,7 @@ const series = chart.addLineSeries();
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -3010,7 +3048,7 @@ function findHalvingEvent(date, halvingEvents) {
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -3204,7 +3242,7 @@ function findHalvingEvent(date, halvingEvents) {
     // Function to fetch data from the API endpoint
     async function fetchDataAndUpdateChart() {
         try {
-            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
+            const response = await fetch(`https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1DAY&time_start=2011-01-01T00:00:00&limit=5000`);
             if (!response.ok) {
                 throw new Error('Failed to fetch data: ' + response.statusText);
             }
@@ -3296,7 +3334,7 @@ function findHalvingEvent(date, halvingEvents) {
 
     // Fetch data from the API and update the chart every 5 seconds
     fetchDataAndUpdateChart();
-    setInterval(fetchDataAndUpdateChart, 5000);
+    //setInterval(fetchDataAndUpdateChart, 5000);
 
     // Add event listener to the real-time button
     const realtimeButton = document.getElementById('realtimeButton');
@@ -3402,7 +3440,7 @@ function findHalvingEvent(date, halvingEvents) {
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     // Fetch data from the API
-    const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1MTH&time_start=2012-01-01T00:00:00&limit=500');
+    const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1MTH&time_start=2012-01-01T00:00:00&limit=500');
     const data = await response.json();
 
     // Prepare an object to hold percentage gains for each month/year
@@ -3460,7 +3498,7 @@ function findHalvingEvent(date, halvingEvents) {
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     // Fetch data from the API (same as previous function)
-    const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-59659DAF-46F7-4981-BCDB-6A10B727341E/history?period_id=1MTH&time_start=2012-01-01T00:00:00&limit=500');
+    const response = await fetch('https://rest.coinapi.io/v1/ohlcv/BITSTAMP_SPOT_BTC_USD/apikey-5942ef05-b4c9-422d-bbcd-2bbe3503d0d4/history?period_id=1MTH&time_start=2012-01-01T00:00:00&limit=500');
     const data = await response.json();
 
     // Prepare objects to hold wins, losses, and total gains for each month (same as previous function)
